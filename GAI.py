@@ -81,8 +81,16 @@ class code_generator(sublime_plugin.TextCommand):
 
 
 class base_code_generator(code_generator):
+    """
+    A base class for generating code. This class should be inherited by specific code generator classes.
+    """
 
     def base_execute(self, edit):
+        """
+        Executes the code generation process.
+
+        :param edit: The text to be edited.
+        """
         self.validate_setup()
 
         selected_region = self.view.sel()[0]
@@ -122,10 +130,18 @@ class base_code_generator(code_generator):
 
     @abstractmethod
     def code_generator_settings(self):
+        """
+        Abstract method to be implemented by child classes. Should return the settings for the code generator.
+        """
         pass
 
     @abstractmethod
     def additional_instruction(self):
+        """
+        Abstract method to be implemented by child classes. Should return any additional instructions for the code generation.
+
+        :return: An empty string by default.
+        """
         return ""
 
 
