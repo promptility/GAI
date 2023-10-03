@@ -9,7 +9,21 @@ from abc import abstractmethod
 
 
 class code_generator(sublime_plugin.TextCommand):
+    """
+    A class used to generate code using OpenAI.
+
+    Methods
+    -------
+    validate_setup():
+        Validates the setup by checking the API key and the selected region of text.
+    manage_thread(thread, seconds=0):
+        Manages the running thread and checks if it's still running or if it has a result.
+    """
+
     def validate_setup(self):
+        """
+        Validates the setup by checking the API key and the selected region of text.
+        """
         configurations = sublime.load_settings('gai.sublime-settings')
         api_key = configurations.get('open_ai_key', None)
         if api_key is None:
@@ -29,6 +43,16 @@ class code_generator(sublime_plugin.TextCommand):
             raise ValueError(message)
 
     def manage_thread(self, thread, seconds=0):
+        """
+        Manages the running thread and checks if it's still running or if it has a result.
+
+        Parameters
+        ----------
+        thread : Thread
+            The thread to manage.
+        seconds : int, optional
+            The number of seconds the thread has been running, by default 0.
+        """
         configurations = sublime.load_settings('gai.sublime-settings')
         max_time = configurations.get('max_seconds', 60)
 
@@ -41,7 +65,6 @@ class code_generator(sublime_plugin.TextCommand):
             message = "Thinking, one moment... ({}/{}s)".format(
                 seconds, max_time)
             sublime.status_message(message)
-            # Wait a second, then check on it again
             sublime.set_timeout(lambda:
                                 self.manage_thread(thread, seconds + 1), 1000)
             return
