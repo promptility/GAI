@@ -19,7 +19,15 @@ This responsibility extends to both its use and artifacts, such as code, text, a
 ## Installation
 
 ### Easy Install
-To install GAI:
+Currently this can only be installed via Github repository. 
+
+First you need to add this repository to package control.
+
+1. Bring-up the command palette.
+2. Select 'Package Control: Add repository'.
+3. Copy paste this repository's URL. 
+
+Subsequently to install GAI:
 
 1. From Sublime
 2. Access 'Package Control' (via 'Preferences' or ctrl+shift+p)
