@@ -1,0 +1,9 @@
+{
+    "name": "GAI",
+    "url": "",
+    "version": "0.1",
+    "description": "A package for Sublime Text that uses AI to co-write and co-code with you using openai's technology.",
+    "platforms": ["*"],
+    "sublime_text": "*",
+    "dependencies": []
+}
