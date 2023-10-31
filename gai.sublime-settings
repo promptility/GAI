@@ -1,42 +1,55 @@
 {
-    "open_ai_key": "<put your key here from https://beta.openai.com/account/api-keys>",
-    "open_ai_base": "api.openai.com", // Or place your own endpoint
-    "open_ai_endpoint": "<put the completions endpoint here>",
-    "max_seconds": 60,
-    "completions": {
-        "model": "gpt-4",
-        "temperature": 0.0,
-        "top_p": 1,
-        "max_tokens": 2000,
-        "keep_prompt_text": true,
-        "persona": "You are a helpful AI Assistant.",
-        "prompt": ""
+    "oai": 
+    {
+        "open_ai_key": "<put your key here from https://beta.openai.com/account/api-keys>",
+        "open_ai_base": "api.openai.com", // Or place your own endpoint
+        "open_ai_endpoint": "<put the completions endpoint here>",
+        "max_seconds": 60,
     },
-    "write": {
-        "model": "gpt-4",
-        "temperature": 0.0,
-        "top_p": 1,
-        "max_tokens": 2000,
-        "keep_prompt_text": false,
-        "persona": "You are a python code generator. You only output the code.",
-        "prompt": "Fill in the python code that is missing. You need to deduct from the function definition and the docstring provided:\n"
-    },
-    "whiten": {
-        "model": "gpt-4",
-        "temperature": 0.0,
-        "top_p": 1,
-        "max_tokens": 2000,
-        "keep_prompt_text": false,
-        "persona": "You are a code generator. You only output the code.",
-        "prompt": "Rewrite this code by replacing all the variable, method, and class names with related but not the same values. You need to keep snake case style. Here is the code:\n"
-    },
-    "edits": {
-        "model": "gpt-4",
-        "temperature": 0.4,
-        "top_p": 1,
-        "max_tokens": 2000,
-        "keep_prompt_text": false,
-        "persona": "You are a nobody. You do whatever is the instruction",
-        "prompt": ""
-    },
+    "commands": {
+        "completions": {
+            "model": "gpt-4",
+            "temperature": 0.0,
+            "top_p": 1,
+            "max_tokens": 2000,
+            "keep_prompt_text": true,
+            "persona": "You are a helpful AI Assistant.",
+            "prompt": "",
+            "alternates": {
+                "gpt35": {
+                    "default": "", // Do not prompt for alternate and do not replace
+                    // "default": "gpt-35", // Uncomment if you want to set gpt35 as alternate
+                    "model": "gpt-35",
+                    "open_ai_endpoint": "<complete this with you endpoit configuration"
+                }
+            }
+        },
+        "write": {
+            "model": "gpt-4",
+            "temperature": 0.0,
+            "top_p": 1,
+            "max_tokens": 2000,
+            "keep_prompt_text": false,
+            "persona": "You are a python code generator. You only output the code.",
+            "prompt": "Fill in the python code that is missing. You need to deduct from the function definition and the docstring provided:\n"
+        },
+        "whiten": {
+            "model": "gpt-4",
+            "temperature": 0.0,
+            "top_p": 1,
+            "max_tokens": 2000,
+            "keep_prompt_text": false,
+            "persona": "You are a code generator. You only output the code.",
+            "prompt": "Rewrite this code by replacing all the variable, method, and class names with related but not the same values. You need to keep snake case style. Here is the code:\n"
+        },
+        "edits": {
+            "model": "gpt-4",
+            "temperature": 0.4,
+            "top_p": 1,
+            "max_tokens": 2000,
+            "keep_prompt_text": false,
+            "persona": "You are a nobody. You do whatever is the instruction",
+            "prompt": ""
+        },
+    }   
 }
