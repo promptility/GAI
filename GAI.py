@@ -15,21 +15,20 @@ class code_generator(sublime_plugin.TextCommand):
     Methods
     -------
     validate_setup():
-        Validates the setup by checking the API key and the selected region of text.
+
+        Validates the setup by checking the API key and the selected region of
+        text.
+
     manage_thread(thread, seconds=0):
-        Manages the running thread and checks if it's still running or if it has a result.
+
+        Manages the running thread and checks if it's still running or if it
+        has a result.
     """
 
     def validate_setup(self):
         """
-        Validates the setup by checking the API key and the selected region of text.
+        Validates the setup by checking there is a selected region of text.
         """
-        # configurations = sublime.load_settings('gai.sublime-settings')
-        # api_key = configurations.get('open_ai_key', None)
-        # if api_key is None:
-        #     message = "Open Ai API key missing."
-        #     sublime.status_message(message)
-        #     raise ValueError(message)
 
         if len(self.view.sel()) > 1:
             message = "Please highlight only one code segment."
@@ -44,7 +43,8 @@ class code_generator(sublime_plugin.TextCommand):
 
     def manage_thread(self, thread, max_time, seconds=0):
         """
-        Manages the running thread and checks if it's still running or if it has a result.
+        Manages the running thread and checks if it's still running or if it
+        has a result.
 
         Parameters
         ----------
@@ -80,7 +80,7 @@ class code_generator(sublime_plugin.TextCommand):
         })
 
 
-class config_handler():
+class configurator():
 
     def __init__(self, configurations, section_name, base_obj):
         self.base_obj = base_obj
@@ -154,12 +154,9 @@ class config_handler():
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
 
-    def ready_wait(self, timeout=10):
-        timeout = 0 - timeout
-        while timeout < 0 and not self.__configuration__completed__:
-            sleep(1)
-            print("--sleeping--")
-            timeout += 1
+    def ready_wait(self, sleep_duration=0.2):
+        while not self.__configuration__completed__:
+            sleep(sleep_duration)
 
     def get_prompt(self, default=""):
         self.ready_wait()
@@ -199,59 +196,59 @@ class base_code_generator(code_generator):
 
         # This reads the configuration but may not have completed parsing the
         # config even after exiting
-        config_handle = config_handler(configurations, section_name, self)
+        config_handle = configurator(configurations, section_name, self)
 
         # Read selection of text from editor
         code_region = self.view.substr(selected_region)
 
-        def create_data():
-
-            data_container = {"text": None, "data": None}
-
-            def async_prepare():
-                # async_prepare the request
-                code_prompt = config_handle.get_prompt()
-                code_instruction = self.additional_instruction()
-                user_code_content = "{} {} {}".format(
-                    code_prompt, code_instruction, code_region)
-
-                data = {
-                    'messages': [{
-                        'role': 'system',
-                        'content': config_handle.get_persona(),
-                    }, {
-                        'role': 'user',
-                        'content': user_code_content
-                    }],
-                    'model': config_handle.get_model(),
-                    'max_tokens': config_handle.get('max_tokens', 100),
-                    'temperature': config_handle.get('temperature', 0),
-                    'top_p': config_handle.get('top_p', 1)
-                }
-
-                text = ""
-                if config_handle.get('keep_prompt_text', False):
-                    text = code_region
-
-                data_container["data"] = data
-                data_container["text"] = text
-
-            prepthread = threading.Thread(target=async_prepare)
-            prepthread.start()
-
-            def await_result(field):
-                prepthread.join()
-                return data_container.get(field)
-
-            return await_result
-
         # Launch thread for async processing of user input and request
-        data_handle = create_data()
+        data_handle = self.create_data(config_handle, code_region)
         codex_thread = async_code_generator(selected_region, config_handle,
                                             data_handle)
         codex_thread.start()
-        self.manage_thread(codex_thread, config_handle.__running_config__[
-                           "max_seconds"], 60)
+        self.manage_thread(codex_thread, config_handle.__running_config__.get(
+                           "max_seconds", 60))
+
+    def create_data(self, config_handle, code_region):
+
+        data_container = {"text": None, "data": None}
+
+        def async_prepare():
+            # async_prepare the request
+            code_prompt = config_handle.get_prompt()
+            code_instruction = self.additional_instruction()
+            user_code_content = "{} {} {}".format(
+                code_prompt, code_instruction, code_region)
+
+            data = {
+                'messages': [{
+                    'role': 'system',
+                    'content': config_handle.get_persona(),
+                }, {
+                    'role': 'user',
+                    'content': user_code_content
+                }],
+                'model': config_handle.get_model(),
+                'max_tokens': config_handle.get('max_tokens', 100),
+                'temperature': config_handle.get('temperature', 0),
+                'top_p': config_handle.get('top_p', 1)
+            }
+
+            text = ""
+            if config_handle.get('keep_prompt_text', False):
+                text = code_region
+
+            data_container["data"] = data
+            data_container["text"] = text
+
+        prepthread = threading.Thread(target=async_prepare)
+        prepthread.start()
+
+        def await_result(field):
+            prepthread.join()
+            return data_container.get(field)
+
+        return await_result
 
     @ abstractmethod
     def code_generator_settings(self):
@@ -371,14 +368,6 @@ class async_code_generator(threading.Thread):
             'Content-Type': 'application/json'
         }
         data = json.dumps(self.data)
-
-        print("=== Connection ===")
-        print(self.endpoint)
-        print("=== Data === ")
-        print(self.data)
-        print("=== API Key ===")
-        print(headers)
-        print("===============")
 
         connection.request('POST', self.endpoint, body=data, headers=headers)
         response = connection.getresponse()
