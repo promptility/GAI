@@ -5,6 +5,10 @@ focus on the creative side of coding.
 
 You must have an account, and API key, and be authorized, to use[OpenAI's API](https://openai.com/blog/openai-api/). 
 
+It supports having multiple different endpoint configurations and selecting at runtime with fully asynchronous computation.
+
+![Concurrent execution with multiple configurations](./media/gai_demo_multi.gif)
+
 ## Disclaimer
 
 You are trusting an outside organization with the code you send them, and it is
