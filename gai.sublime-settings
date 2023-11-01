@@ -6,6 +6,9 @@
         "open_ai_endpoint": "<put the completions endpoint here>",
         "max_seconds": 60,
     },
+    // "alternates":{
+
+    // },
     "commands": {
         "completions": {
             "model": "gpt-4",
@@ -15,14 +18,14 @@
             "keep_prompt_text": true,
             "persona": "You are a helpful AI Assistant.",
             "prompt": "",
-            "alternates": {
-                "gpt35": {
-                    "default": "", // Do not prompt for alternate and do not replace
-                    // "default": "gpt-35", // Uncomment if you want to set gpt35 as alternate
-                    "model": "gpt-35",
-                    "open_ai_endpoint": "<complete this with you endpoit configuration"
-                }
-            }
+            // "alternates": {
+            //     "gpt35": {
+            //         "default": "", // Do not prompt for alternate and do not replace the configuratoin in this
+            //         // "default": "gpt-35", // Uncomment if you want to set gpt35 as alternate
+            //         "model": "gpt-35",
+            //         "open_ai_endpoint": "<complete this with you endpoit configuration"
+            //     }
+            // }
         },
         "write": {
             "model": "gpt-4",
