@@ -4,7 +4,7 @@ import sublime_plugin
 import json
 import http.client
 import threading
-
+from time import sleep
 from abc import abstractmethod
 
 
@@ -96,9 +96,8 @@ class config_handler():
         self.__running_config__ = {}
         self.__running_config__["alternates"] = configurations.get(
             "alternates", {})
-
+        self.__configuration__completed__ = False
         self.__construct__running__config__()
-        print(self.__running_config__)
 
     def __construct__running__config__(self):
 
@@ -136,38 +135,53 @@ class config_handler():
 
         def on_done(index):
             if index == -1:
+                self.__configuration__completed__ = True
                 return
             configs_list = ["__default__"]
             configs_list += list(alternates.keys())
             selected_config = configs_list[index]
             if selected_config != "__default__":
                 replace_config(selected_config)
+            self.__configuration__completed__ = True
 
         default_alternate = self.__running_config__[
             "alternates"].get("default", None)
         if default_alternate is not None:
             replace_config(default_alternate)
+            self.__configuration__completed__ = True
         else:
             alternates = self.__running_config__["alternates"]
             self.base_obj.view.window().show_quick_panel(
-                ["default"] + list(alternates.keys()), on_done)
+                ["default"] + list(alternates.keys()), on_select=on_done)
+
+    def ready_wait(self, timeout=10):
+        timeout = 0 - timeout
+        while timeout < 0 and not self.__configuration__completed__:
+            sleep(1)
+            print("--sleeping--")
+            timeout += 1
 
     def get_prompt(self, default=""):
+        self.ready_wait()
         return self.__running_config__.get("prompt", default)
 
     def get_persona(self, default="You are a helpful AI Assistant"):
+        self.ready_wait()
         return self.__running_config__.get("persona", default)
 
     def get_model(self, default="gpt-4"):
+        self.ready_wait()
         return self.__running_config__.get("model", default)
 
     def get(self, key, default=None):
+        self.ready_wait()
         return self.__running_config__.get(key, default)
 
 
 class base_code_generator(code_generator):
     """
-    A base class for generating code. This class should be inherited by specific code generator classes.
+    A base class for generating code. This class should be inherited by
+    specific code generator classes.
     """
 
     def base_execute(self, edit):
@@ -182,56 +196,76 @@ class base_code_generator(code_generator):
         # Load sublime configuration into config handler
         configurations = sublime.load_settings('gai.sublime-settings')
         section_name = self.code_generator_settings()
+
+        # This reads the configuration but may not have completed parsing the
+        # config even after exiting
         config_handle = config_handler(configurations, section_name, self)
 
         # Read selection of text from editor
         code_region = self.view.substr(selected_region)
 
-        # Prepare the request
-        code_prompt = config_handle.get_prompt()
-        code_instruction = self.additional_instruction()
-        user_code_content = "{} {} {}".format(
-            code_prompt, code_instruction, code_region)
-        data = {
-            'messages': [{
-                'role': 'system',
-                'content': config_handle.get_persona(),
-            }, {
-                'role': 'user',
-                'content': user_code_content
-            }],
-            'model': config_handle.get_model(),
-            'max_tokens': config_handle.get('max_tokens', 100),
-            'temperature': config_handle.get('temperature', 0),
-            'top_p': config_handle.get('top_p', 1)
-        }
+        def create_data():
 
-        replace_text = config_handle.get('keep_prompt_text', False)
+            data_container = {"text": None, "data": None}
 
-        if replace_text:
-            text_replacement = self.view.substr(selected_region)
-        else:
-            text_replacement = ""
-        thread = async_code_generator(selected_region,
-                                      config_handle.get("open_ai_endpoint"),
-                                      config_handle.get("open_ai_base"),
-                                      config_handle.get("open_ai_key"),
-                                      data, text_replacement)
+            def async_prepare():
+                # async_prepare the request
+                code_prompt = config_handle.get_prompt()
+                code_instruction = self.additional_instruction()
+                user_code_content = "{} {} {}".format(
+                    code_prompt, code_instruction, code_region)
 
-        thread.start()
-        self.manage_thread(thread, config_handle.get("max_seconds", 60))
+                data = {
+                    'messages': [{
+                        'role': 'system',
+                        'content': config_handle.get_persona(),
+                    }, {
+                        'role': 'user',
+                        'content': user_code_content
+                    }],
+                    'model': config_handle.get_model(),
+                    'max_tokens': config_handle.get('max_tokens', 100),
+                    'temperature': config_handle.get('temperature', 0),
+                    'top_p': config_handle.get('top_p', 1)
+                }
 
-    @abstractmethod
+                text = ""
+                if config_handle.get('keep_prompt_text', False):
+                    text = code_region
+
+                data_container["data"] = data
+                data_container["text"] = text
+
+            prepthread = threading.Thread(target=async_prepare)
+            prepthread.start()
+
+            def await_result(field):
+                prepthread.join()
+                return data_container.get(field)
+
+            return await_result
+
+        # Launch thread for async processing of user input and request
+        data_handle = create_data()
+        codex_thread = async_code_generator(selected_region, config_handle,
+                                            data_handle)
+        codex_thread.start()
+        self.manage_thread(codex_thread, config_handle.__running_config__[
+                           "max_seconds"], 60)
+
+    @ abstractmethod
     def code_generator_settings(self):
         """
-        Abstract method to be implemented by child classes. Should return the settings for the code generator.
+        Abstract method to be implemented by child classes. Should return the
+        settings for the code generator.
         """
         pass
 
-    @abstractmethod
+    @ abstractmethod
     def additional_instruction(self):
         """
-        Abstract method to be implemented by child classes. Should return any additional instructions for the code generation.
+        Abstract method to be implemented by child classes. Should return any
+        additional instructions for the code generation.
 
         :return: An empty string by default.
         """
@@ -293,7 +327,7 @@ class async_code_generator(threading.Thread):
     running = False
     result = None
 
-    def __init__(self, region, endpoint, apibase, apikey, data, text_replacement):
+    def __init__(self, region, config_handle, data_handle):
         """
         Args:
             Key (str): The specific user's API key provided by Open-AI.
@@ -311,13 +345,10 @@ class async_code_generator(threading.Thread):
             None
         """
         super().__init__()
+
         self.region = region
-        self.endpoint = endpoint
-        self.apibase = apibase
-        self.apikey = apikey
-        self.data = data
-        self.prompt = data.get('prompt', "")
-        self.text_replace = text_replacement
+        self.config_handle = config_handle
+        self.data_handle = data_handle
 
     def run(self):
         self.running = True
@@ -325,6 +356,12 @@ class async_code_generator(threading.Thread):
         self.running = False
 
     def get_code_generator_response(self):
+
+        self.endpoint = self.config_handle.get("open_ai_endpoint")
+        self.apibase = self.config_handle.get("open_ai_base")
+        self.apikey = self.config_handle.get("open_ai_key")
+        self.data = self.data_handle("data")
+        self.text_replace = self.data_handle("text")
 
         connection = http.client.HTTPSConnection(
             self.apibase)
@@ -334,6 +371,14 @@ class async_code_generator(threading.Thread):
             'Content-Type': 'application/json'
         }
         data = json.dumps(self.data)
+
+        print("=== Connection ===")
+        print(self.endpoint)
+        print("=== Data === ")
+        print(self.data)
+        print("=== API Key ===")
+        print(headers)
+        print("===============")
 
         connection.request('POST', self.endpoint, body=data, headers=headers)
         response = connection.getresponse()
@@ -347,6 +392,9 @@ class async_code_generator(threading.Thread):
             usage = response_dict['usage']['total_tokens']
             sublime.status_message("Tokens used: " + str(usage))
         return ai_code
+
+    def get_max_seconds(self):
+        return self.config_handle.get("max_seconds", 60)
 
 
 class replace_text_command(sublime_plugin.TextCommand):
