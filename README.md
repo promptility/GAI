@@ -39,6 +39,38 @@ Subsequently to install GAI:
 First: input your OpenAI API key in the Preferences->Package Settings->GAI. 
 Alternatively, use the command palette to bring up the settings (GAI: Settings). Do not edit the left side of , but place your settings on the right side.
 
+The configuration is structured in a format that allows to customize easily both per command but also globally with multiple endpoints.
+
+```json
+{
+    "oai" : {
+        // put your openai connection information here ( consult the configuration for details)
+    }, 
+    "alternates" : {
+        // Allows to provide multiple top-level different configurations, e.g. 
+        "my_gpt_4": {
+            // ...
+        }, 
+        "my_gpt_3": {
+            // ...
+        }
+    },
+    "commands" : {
+        "completions" : {
+            // Put the configuration options here such as connection information
+            // and other customizations , such as prompt, personas etc.
+            "alternates" : {
+                // configurations in here will replace top-level alternates 
+                // with the same key. New keys will be appended.
+                "default": "", // if set to an alternate configuration name it will default to this and user selection is supressed.
+            }
+        }
+    }
+}
+```
+
+The populated list of the alternates configuration will be shows to the user when the "default" is not set.
+
 ### Completion
 
 Write your function definition with a docstring possibly. Then highlight, and bring-up the command palette to selection 'GAI: Python code generation'.
