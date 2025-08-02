@@ -340,6 +340,10 @@ class async_code_generator(threading.Thread):
             self.result = []
         self.running = False
 
+        if self.file_handler is not None:
+            self.file_handler.close()
+            logger.removeHandler(self.file_handler)
+
     def setup_logs(self):
 
         def stream_handler_added():
@@ -351,8 +355,8 @@ class async_code_generator(threading.Thread):
             return cur_file == os.path.abspath(lfile)
 
         def file_handler_not_added(logfile):
-            return any(isinstance(handler) and not_same(handler, logfile) 
-                for handler in logger.handlers)
+            return any(isinstance(handler, logging.FileHandler) 
+                and not_same(handler, logfile) for handler in logger.handlers)
 
         # Add a stream handler if not already defined given configuration
         if self.config_handle.get("log_level", None) is not None:
