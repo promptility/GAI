@@ -338,11 +338,12 @@ class async_code_generator(threading.Thread):
             self.result = self.get_code_generator_response()
         else:
             self.result = []
-        self.running = False
 
         if self.logging_file_handler is not None:
             self.logging_file_handler.close()
             logger.removeHandler(self.logging_file_handler)
+        
+        self.running = False
 
     def setup_logs(self):
 
@@ -372,7 +373,7 @@ class async_code_generator(threading.Thread):
             file_handler = logging.FileHandler(file_log_io)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
-            self.file_handler = file_handler
+            self.logging_file_handler = file_handler
 
     def get_code_generator_response(self):
 
