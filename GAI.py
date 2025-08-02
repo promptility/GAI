@@ -86,6 +86,8 @@ class configurator():
         self.base_obj = base_obj
         self.__section_cursor__ = section_name
 
+        self.cancelled = False  # Add this flag
+
         # Read Sublime Text configuration object
         self.source_config = {}
         self.source_config["oai"] = configurations.get("oai", {})
@@ -135,13 +137,13 @@ class configurator():
 
         def on_done(index):
             if index == -1:
-                self.__configuration__completed__ = True
-                return
-            configs_list = ["__default__"]
-            configs_list += list(alternates.keys())
-            selected_config = configs_list[index]
-            if selected_config != "__default__":
-                replace_config(selected_config)
+                self.cancelled = True  # Cancelled
+            else:
+                configs_list = ["__default__"]
+                configs_list += list(alternates.keys())
+                selected_config = configs_list[index]
+                if selected_config != "__default__":
+                    replace_config(selected_config)
             self.__configuration__completed__ = True
 
         default_alternate = self.__running_config__[
@@ -157,6 +159,10 @@ class configurator():
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
             sleep(sleep_duration)
+
+    def is_cancelled(self):
+        self.ready_wait()
+        return self.cancelled
 
     def get_prompt(self, default=""):
         self.ready_wait()
@@ -180,34 +186,27 @@ class base_code_generator(code_generator):
     A base class for generating code. This class should be inherited by
     specific code generator classes.
     """
-
     def base_execute(self, edit):
-        """
-        Executes the code generation process.
+        if config_handle.is_cancelled():
+            return
 
-        :param edit: The text to be edited.
-        """
         self.validate_setup()
         selected_region = self.view.sel()[0]
 
-        # Load sublime configuration into config handler
         configurations = sublime.load_settings('gai.sublime-settings')
         section_name = self.code_generator_settings()
 
-        # This reads the configuration but may not have completed parsing the
-        # config even after exiting
         config_handle = configurator(configurations, section_name, self)
 
-        # Read selection of text from editor
         code_region = self.view.substr(selected_region)
 
-        # Launch thread for async processing of user input and request
         data_handle = self.create_data(config_handle, code_region)
         codex_thread = async_code_generator(selected_region, config_handle,
                                             data_handle)
         codex_thread.start()
         self.manage_thread(codex_thread, config_handle.__running_config__.get(
                            "max_seconds", 60))
+
 
     def create_data(self, config_handle, code_region):
 
@@ -435,3 +434,4 @@ class edit_gai_plugin_settings_command(sublime_plugin.ApplicationCommand):
         new_window.focus_group(1)
         new_window.run_command(
             'open_file', {'file': '${packages}/User/gai.sublime-settings'})
+
