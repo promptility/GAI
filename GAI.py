@@ -365,7 +365,7 @@ class async_code_generator(threading.Thread):
 
         headers = {
             'api-key': self.apikey,
-            'Authorization': f'Bearer {self.apikey}',
+            'Authorization': 'Bearer {}'.format(self.apikey),
             'Content-Type': 'application/json'
         }
         data = json.dumps(self.data)
