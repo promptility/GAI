@@ -141,7 +141,9 @@ class configurator():
             else:
                 configs_list = ["__default__"]
                 configs_list += list(alternates.keys())
+
                 selected_config = configs_list[index]
+                
                 if selected_config != "__default__":
                     replace_config(selected_config)
             self.__configuration__completed__ = True
@@ -189,7 +191,6 @@ class base_code_generator(code_generator):
     def base_execute(self, edit):
 
         self.validate_setup()
-        selected_region = self.view.sel()[0]
 
         configurations = sublime.load_settings('gai.sublime-settings')
         section_name = self.code_generator_settings()
@@ -198,6 +199,7 @@ class base_code_generator(code_generator):
 
         if not config_handle.is_cancelled():
 
+            selected_region = self.view.sel()[0]
             code_region = self.view.substr(selected_region)
 
             data_handle = self.create_data(config_handle, code_region)
@@ -206,7 +208,6 @@ class base_code_generator(code_generator):
             codex_thread.start()
             self.manage_thread(codex_thread, config_handle.__running_config__.get(
                                "max_seconds", 60))
-
 
     def create_data(self, config_handle, code_region):
 
