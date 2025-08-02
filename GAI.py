@@ -141,9 +141,7 @@ class configurator():
             else:
                 configs_list = ["__default__"]
                 configs_list += list(alternates.keys())
-
                 selected_config = configs_list[index]
-                
                 if selected_config != "__default__":
                     replace_config(selected_config)
             self.__configuration__completed__ = True
@@ -155,8 +153,9 @@ class configurator():
             self.__configuration__completed__ = True
         else:
             alternates = self.__running_config__["alternates"]
-            self.base_obj.view.window().show_quick_panel(
-                ["default"] + list(alternates.keys()), on_select=on_done)
+
+        self.base_obj.view.window().show_quick_panel(
+            ["default"] + list(alternates.keys()), on_select=on_done)
 
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
