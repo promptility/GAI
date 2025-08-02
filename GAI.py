@@ -342,7 +342,7 @@ class async_code_generator(threading.Thread):
 
     def setup_logs(self):
 
-        def stream_handler_not_added():
+        def stream_handler_added():
             return any(isinstance(handler, logging.StreamHandler) 
                 for handler in logger.handlers)
 
@@ -356,7 +356,7 @@ class async_code_generator(threading.Thread):
 
         # Add a stream handler if not already defined given configuration
         if self.config_handle.get("log_level", None) is not None:
-            if stream_handler_not_added():
+            if not stream_handler_added():
                 stream_handler = logging.StreamHandler()
                 stream_handler.setFormatter(formatter)
                 logger.addHandler(stream_handler)
@@ -388,7 +388,7 @@ class async_code_generator(threading.Thread):
         }
         data = json.dumps(self.data)
 
-        log_level = self.config_handle.get("log_level", "requests")
+        log_level = self.config_handle.get("log_level", None)
 
         if log_level in ["requests", "all"]:
             logger.info("Request Headers: %s", json.dumps(headers, indent=4))
