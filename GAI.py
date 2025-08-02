@@ -351,13 +351,13 @@ class async_code_generator(threading.Thread):
             return any(isinstance(handler, logging.StreamHandler) 
                 for handler in logger.handlers)
 
-        def not_same(cur_handler, lfile):
+        def same(cur_handler, lfile):
             cur_file = os.path.abspath(cur_handler.baseFilename)
             return cur_file == os.path.abspath(lfile)
 
-        def file_handler_not_added(logfile):
+        def file_handler_added(logfile):
             return any(isinstance(handler, logging.FileHandler) 
-                and not_same(handler, logfile) for handler in logger.handlers)
+                and same(handler, logfile) for handler in logger.handlers)
 
         # Add a stream handler if not already defined given configuration
         if self.config_handle.get("log_level", None) is not None:
@@ -369,11 +369,11 @@ class async_code_generator(threading.Thread):
         # Add a file handler if not already present given configuration
         file_log_io = self.config_handle.get("log_file", None)
         
-        if file_log_io is not None and file_handler_not_added(file_log_io):
+        if file_log_io is not None and not file_handler_added(file_log_io):
             file_handler = logging.FileHandler(file_log_io)
+            self.logging_file_handler = file_handler
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
-            self.logging_file_handler = file_handler
 
     def get_code_generator_response(self):
 
