@@ -1,11 +1,28 @@
 import sublime
 import sublime_plugin
-
 import json
 import http.client
 import threading
 from time import sleep
 from abc import abstractmethod
+import logging
+
+# Create a logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Create a file handler and a stream handler
+file_handler = logging.FileHandler('gai.log')
+stream_handler = logging.StreamHandler()
+
+# Create a formatter and attach it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+stream_handler.setFormatter(formatter)
+
+# Add the handlers to the logger
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 
 class code_generator(sublime_plugin.TextCommand):
@@ -86,7 +103,7 @@ class configurator():
         self.base_obj = base_obj
         self.__section_cursor__ = section_name
 
-        self.cancelled = False  # Add this flag
+        self.cancelled = False  
 
         # Read Sublime Text configuration object
         self.source_config = {}
@@ -137,7 +154,7 @@ class configurator():
 
         def on_done(index):
             if index == -1:
-                self.cancelled = True  # Cancelled
+                self.cancelled = True  
             else:
                 configs_list = ["__default__"]
                 configs_list += list(alternates.keys())
@@ -211,7 +228,6 @@ class base_code_generator(code_generator):
         data_container = {"text": None, "data": None}
 
         def async_prepare():
-            # async_prepare the request
             code_prompt = config_handle.get_prompt()
             code_instruction = self.additional_instruction()
             user_code_content = "{} {} {}".format(
@@ -238,9 +254,9 @@ class base_code_generator(code_generator):
             data_container["data"] = data
             data_container["text"] = text
 
-            # Log the request data
-            print("Request Data:")
-            print(json.dumps(data, indent=4))
+            log_level = config_handle.get("log_level", "requests")
+            if log_level in ["requests", "all"]:
+                logger.info("Request Data: %s", json.dumps(data, indent=4))
 
         prepthread = threading.Thread(target=async_prepare)
         prepthread.start()
@@ -253,20 +269,10 @@ class base_code_generator(code_generator):
 
     @ abstractmethod
     def code_generator_settings(self):
-        """
-        Abstract method to be implemented by child classes. Should return the
-        settings for the code generator.
-        """
         pass
 
     @ abstractmethod
     def additional_instruction(self):
-        """
-        Abstract method to be implemented by child classes. Should return any
-        additional instructions for the code generation.
-
-        :return: An empty string by default.
-        """
         return ""
 
 
@@ -326,22 +332,6 @@ class async_code_generator(threading.Thread):
     result = None
 
     def __init__(self, region, config_handle, data_handle):
-        """
-        Args:
-            Key (str): The specific user's API key provided by Open-AI.
-
-            Prompt (str): The code or text string that GPT3 will manipulate.
-
-            Region (str): The highlighted area in sublime-text that we are
-            examining and where the result will be placed.
-
-            Instruction (str, optional): An instruction is required for the
-            edit endpoint, such as "translate this code to JavaScript". If
-            only code generation is needed, leave it as None.
-
-        Returns:
-            None
-        """
         super().__init__()
 
         self.region = region
@@ -377,27 +367,20 @@ class async_code_generator(threading.Thread):
         log_level = self.config_handle.get("log_level", "requests")
 
         if log_level in ["requests", "all"]:
-            # Log the request headers and data
-            print("Request Headers:")
-            print(json.dumps(headers, indent=4))
-            print("Request Data:")
-            print(json.dumps(self.data, indent=4))
+            logger.info("Request Headers: %s", json.dumps(headers, indent=4))
+            logger.info("Request Data: %s", json.dumps(self.data, indent=4))
 
         connection.request('POST', self.endpoint, body=data, headers=headers)
         response = connection.getresponse()
 
         if log_level in ["all"]:
-            # Log the response status and headers
-            print("Response Status:", response.status)
-            print("Response Headers:")
-            print(json.dumps(dict(response.headers), indent=4))
+            logger.info("Response Status: %s", response.status)
+            logger.info("Response Headers: %s", json.dumps(dict(response.headers), indent=4))
 
         response_dict = json.loads(response.read().decode())
 
         if log_level in ["all"]:
-            # Log the response data
-            print("Response Data:")
-            print(json.dumps(response_dict, indent=4))
+            logger.info("Response Data: %s", json.dumps(response_dict, indent=4))
 
         if response_dict.get('error', None):
             raise ValueError(response_dict['error'])
@@ -413,30 +396,8 @@ class async_code_generator(threading.Thread):
 
 
 class replace_text_command(sublime_plugin.TextCommand):
-    """
-    A Sublime Text command class that replaces a specified region of text with
-    new text.
-
-    Attributes:
-        view (sublime.View): The view where the command is executed.
-    """
 
     def run(self, edit, region, text):
-        """
-        The main method that is run when the command is executed.
-
-        Args: edit (sublime.Edit): The edit token used to group changes into a
-            single undo/redo operation.
-
-            region (tuple): A tuple representing the region of text to be
-            replaced.
-
-            text (str): The new text that will replace the old text in the
-            specified region.
-
-        Returns:
-            None
-        """
         region = sublime.Region(*region)
         self.view.replace(edit, region, text)
 
@@ -460,4 +421,3 @@ class edit_gai_plugin_settings_command(sublime_plugin.ApplicationCommand):
         new_window.focus_group(1)
         new_window.run_command(
             'open_file', {'file': '${packages}/User/gai.sublime-settings'})
-
