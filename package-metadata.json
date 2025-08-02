@@ -1,8 +1,7 @@
 {
-    "name": "GAI_DEV_V2",
-    "url": "http://localhost:8888/GAI",
-    "version": "0.2.0-dev",
-    "description": "A package for Sublime Text that uses AI to co-write and co-code with you using openai's technology.",
+    "name": "GAI",
+    "version": "0.2.1-dev",
+    "description": "Co-code and Co-write with Sublime Text using AI to co-write and co-code",
     "platforms": ["*"],
     "sublime_text": "*"
 }
