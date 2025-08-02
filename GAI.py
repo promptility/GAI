@@ -153,9 +153,8 @@ class configurator():
             self.__configuration__completed__ = True
         else:
             alternates = self.__running_config__["alternates"]
-
-        self.base_obj.view.window().show_quick_panel(
-            ["default"] + list(alternates.keys()), on_select=on_done)
+            self.base_obj.view.window().show_quick_panel(
+                ["default"] + list(alternates.keys()), on_select=on_done)
 
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
@@ -196,17 +195,17 @@ class base_code_generator(code_generator):
 
         config_handle = configurator(configurations, section_name, self)
 
-        if not config_handle.is_cancelled():
 
-            selected_region = self.view.sel()[0]
-            code_region = self.view.substr(selected_region)
+        selected_region = self.view.sel()[0]
+        code_region = self.view.substr(selected_region)
 
-            data_handle = self.create_data(config_handle, code_region)
-            codex_thread = async_code_generator(selected_region, config_handle,
-                                                data_handle)
-            codex_thread.start()
-            self.manage_thread(codex_thread, config_handle.__running_config__.get(
-                               "max_seconds", 60))
+        data_handle = self.create_data(config_handle, code_region)
+
+        codex_thread = async_code_generator(selected_region, config_handle,
+                                            data_handle, self.is_cancelled)
+        codex_thread.start()
+        self.manage_thread(codex_thread, config_handle.__running_config__.get(
+                           "max_seconds", 60))
 
     def create_data(self, config_handle, code_region):
 
@@ -323,7 +322,7 @@ class async_code_generator(threading.Thread):
     running = False
     result = None
 
-    def __init__(self, region, config_handle, data_handle):
+    def __init__(self, region, config_handle, data_handle, user_kill):
         """
         Args:
             Key (str): The specific user's API key provided by Open-AI.
@@ -345,10 +344,14 @@ class async_code_generator(threading.Thread):
         self.region = region
         self.config_handle = config_handle
         self.data_handle = data_handle
+        self.user_cancellation_request = user_kill
 
     def run(self):
         self.running = True
-        self.result = self.get_code_generator_response()
+        if not self.user_cancellation_request:
+            self.result = self.get_code_generator_response()
+        else:
+            self.result = []
         self.running = False
 
     def get_code_generator_response(self):
