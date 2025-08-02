@@ -340,9 +340,9 @@ class async_code_generator(threading.Thread):
             self.result = []
         self.running = False
 
-        if self.file_handler is not None:
-            self.file_handler.close()
-            logger.removeHandler(self.file_handler)
+        if self.logging_file_handler is not None:
+            self.logging_file_handler.close()
+            logger.removeHandler(self.logging_file_handler)
 
     def setup_logs(self):
 
