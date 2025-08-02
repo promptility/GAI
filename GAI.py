@@ -374,25 +374,30 @@ class async_code_generator(threading.Thread):
         }
         data = json.dumps(self.data)
 
-        # Log the request headers and data
-        print("Request Headers:")
-        print(json.dumps(headers, indent=4))
-        print("Request Data:")
-        print(json.dumps(self.data, indent=4))
+        log_level = self.config_handle.get("log_level", "requests")
+
+        if log_level in ["requests", "all"]:
+            # Log the request headers and data
+            print("Request Headers:")
+            print(json.dumps(headers, indent=4))
+            print("Request Data:")
+            print(json.dumps(self.data, indent=4))
 
         connection.request('POST', self.endpoint, body=data, headers=headers)
         response = connection.getresponse()
 
-        # Log the response status and headers
-        print("Response Status:", response.status)
-        print("Response Headers:")
-        print(json.dumps(dict(response.headers), indent=4))
+        if log_level in ["all"]:
+            # Log the response status and headers
+            print("Response Status:", response.status)
+            print("Response Headers:")
+            print(json.dumps(dict(response.headers), indent=4))
 
         response_dict = json.loads(response.read().decode())
 
-        # Log the response data
-        print("Response Data:")
-        print(json.dumps(response_dict, indent=4))
+        if log_level in ["all"]:
+            # Log the response data
+            print("Response Data:")
+            print(json.dumps(response_dict, indent=4))
 
         if response_dict.get('error', None):
             raise ValueError(response_dict['error'])
@@ -455,3 +460,4 @@ class edit_gai_plugin_settings_command(sublime_plugin.ApplicationCommand):
         new_window.focus_group(1)
         new_window.run_command(
             'open_file', {'file': '${packages}/User/gai.sublime-settings'})
+
