@@ -1,5 +1,6 @@
 import sublime
 import sublime_plugin
+import os
 import json
 import http.client
 import threading
@@ -11,18 +12,8 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-# Create a file handler and a stream handler
-file_handler = logging.FileHandler('gai.log')
-stream_handler = logging.StreamHandler()
-
 # Create a formatter and attach it to the handlers
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-stream_handler.setFormatter(formatter)
-
-# Add the handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
 
 
 class code_generator(sublime_plugin.TextCommand):
@@ -338,13 +329,46 @@ class async_code_generator(threading.Thread):
         self.config_handle = config_handle
         self.data_handle = data_handle
 
+        self.logging_file_handler = None
+
     def run(self):
         self.running = True
+        self.setup_logs()
         if not self.config_handle.is_cancelled():
             self.result = self.get_code_generator_response()
         else:
             self.result = []
         self.running = False
+
+    def setup_logs(self):
+
+        def stream_handler_not_added():
+            return any(isinstance(handler, logging.StreamHandler) 
+                for handler in logger.handlers)
+
+        def not_same(cur_handler, lfile):
+            cur_file = os.path.abspath(cur_handler.baseFilename)
+            return cur_file == os.path.abspath(lfile)
+
+        def file_handler_not_added(logfile):
+            return any(isinstance(handler) and not_same(handler, logfile) 
+                for handler in logger.handlers)
+
+        # Add a stream handler if not already defined given configuration
+        if self.config_handle.get("log_level", None) is not None:
+            if stream_handler_not_added():
+                stream_handler = logging.StreamHandler()
+                stream_handler.setFormatter(formatter)
+                logger.addHandler(stream_handler)
+
+        # Add a file handler if not already present given configuration
+        file_log_io = self.config_handle.get("log_file", None)
+        
+        if file_log_io is not None and file_handler_not_added(file_log_io):
+            file_handler = logging.FileHandler(file_log_io)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+            self.file_handler = file_handler
 
     def get_code_generator_response(self):
 
