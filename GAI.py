@@ -161,7 +161,7 @@ class configurator():
             sleep(sleep_duration)
 
     def is_cancelled(self):
-        self.ready_wait()
+        # self.ready_wait()
         return self.cancelled
 
     def get_prompt(self, default=""):
@@ -195,14 +195,13 @@ class base_code_generator(code_generator):
 
         config_handle = configurator(configurations, section_name, self)
 
-
         selected_region = self.view.sel()[0]
         code_region = self.view.substr(selected_region)
 
         data_handle = self.create_data(config_handle, code_region)
 
         codex_thread = async_code_generator(selected_region, config_handle,
-                                            data_handle, self.is_cancelled)
+                                            data_handle, config_handle.is_cancelled())
         codex_thread.start()
         self.manage_thread(codex_thread, config_handle.__running_config__.get(
                            "max_seconds", 60))
