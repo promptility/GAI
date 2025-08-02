@@ -136,7 +136,7 @@ class configurator():
                     config_override, self.__running_config__)
 
         def on_done(index):
-            if self.cancelled == False and index == -1:
+            if index == -1:
                 self.cancelled = True  # Cancelled
             else:
                 configs_list = ["__default__"]
@@ -201,7 +201,7 @@ class base_code_generator(code_generator):
         data_handle = self.create_data(config_handle, code_region)
 
         codex_thread = async_code_generator(selected_region, config_handle,
-                                            data_handle, config_handle.is_cancelled())
+                                            data_handle)
         codex_thread.start()
         self.manage_thread(codex_thread, config_handle.__running_config__.get(
                            "max_seconds", 60))
@@ -321,7 +321,7 @@ class async_code_generator(threading.Thread):
     running = False
     result = None
 
-    def __init__(self, region, config_handle, data_handle, user_kill):
+    def __init__(self, region, config_handle, data_handle):
         """
         Args:
             Key (str): The specific user's API key provided by Open-AI.
@@ -343,11 +343,10 @@ class async_code_generator(threading.Thread):
         self.region = region
         self.config_handle = config_handle
         self.data_handle = data_handle
-        self.user_cancellation_request = user_kill
 
     def run(self):
         self.running = True
-        if not self.user_cancellation_request:
+        if not self.config_handle.is_cancelled():
             self.result = self.get_code_generator_response()
         else:
             self.result = []
