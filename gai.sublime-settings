@@ -5,6 +5,9 @@
         "open_ai_base": "api.openai.com", // Or place your own endpoint
         "open_ai_endpoint": "<put the completions endpoint here>",
         "max_seconds": 60,
+        "log_level":"requests",
+        // "log_file": "/home/tron/sublime-requests.log"
+
     },
     // "alternates":{
 
