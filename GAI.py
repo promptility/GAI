@@ -187,8 +187,6 @@ class base_code_generator(code_generator):
     specific code generator classes.
     """
     def base_execute(self, edit):
-        if config_handle.is_cancelled():
-            return
 
         self.validate_setup()
         selected_region = self.view.sel()[0]
@@ -198,14 +196,16 @@ class base_code_generator(code_generator):
 
         config_handle = configurator(configurations, section_name, self)
 
-        code_region = self.view.substr(selected_region)
+        if not config_handle.is_cancelled():
 
-        data_handle = self.create_data(config_handle, code_region)
-        codex_thread = async_code_generator(selected_region, config_handle,
-                                            data_handle)
-        codex_thread.start()
-        self.manage_thread(codex_thread, config_handle.__running_config__.get(
-                           "max_seconds", 60))
+            code_region = self.view.substr(selected_region)
+
+            data_handle = self.create_data(config_handle, code_region)
+            codex_thread = async_code_generator(selected_region, config_handle,
+                                                data_handle)
+            codex_thread.start()
+            self.manage_thread(codex_thread, config_handle.__running_config__.get(
+                               "max_seconds", 60))
 
 
     def create_data(self, config_handle, code_region):
