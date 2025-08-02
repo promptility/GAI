@@ -136,7 +136,7 @@ class configurator():
                     config_override, self.__running_config__)
 
         def on_done(index):
-            if index == -1:
+            if self.cancelled == False and index == -1:
                 self.cancelled = True  # Cancelled
             else:
                 configs_list = ["__default__"]
@@ -161,7 +161,7 @@ class configurator():
             sleep(sleep_duration)
 
     def is_cancelled(self):
-        # self.ready_wait()
+        self.ready_wait()
         return self.cancelled
 
     def get_prompt(self, default=""):
