@@ -1,9 +1,8 @@
 {
-    "name": "GAI-X",
-    "url": "https://github.com/flerim/GAI.git",
-    "version": "0.2.0",
+    "name": "GAI_DEV_V2",
+    "url": "http://localhost:8888/GAI",
+    "version": "0.2.0-dev",
     "description": "A package for Sublime Text that uses AI to co-write and co-code with you using openai's technology.",
     "platforms": ["*"],
-    "sublime_text": "*",
-    "dependencies": []
+    "sublime_text": "*"
 }
