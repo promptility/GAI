@@ -119,7 +119,6 @@ class configurator():
                 # Consider merging different value types , e.g. string personas based on key
 
                 target_prio_str_keys = [ 
-                    "persona",
                     "prompt"
                 ]
                 target_prio_str_keys = self.source_config__meta__.get("target_prio_str_keys", target_prio_str_keys)
@@ -320,6 +319,15 @@ class base_code_generator(code_generator):
     @ abstractmethod
     def additional_instruction(self):
         return ""
+
+
+class generate_code_generator(base_code_generator):
+
+    def run(self, edit):
+        super().base_execute(edit)
+
+    def code_generator_settings(self):
+        return "generate"
 
 
 class write_code_generator(base_code_generator):

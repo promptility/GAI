@@ -19,7 +19,6 @@
             "top_p": 1,
             "max_tokens": 2000,
             "keep_prompt_text": true,
-            "persona": "You are a helpful AI Assistant.",
             "prompt": "",
             // "alternates": {
             //     "gpt35": {
@@ -30,8 +29,11 @@
             //     }
             // }
         },
+        "generate": {
+            "persona": "You are a helpful AI Assistant.",
+            "keep_prompt_text": true,
+        },
         "write": {
-            "model": "gpt-4",
             "temperature": 0.0,
             "top_p": 1,
             "max_tokens": 2000,
@@ -40,7 +42,6 @@
             "prompt": "Fill in the python code that is missing. You need to deduct from the function definition and the docstring provided:\n"
         },
         "whiten": {
-            "model": "gpt-4",
             "temperature": 0.0,
             "top_p": 1,
             "max_tokens": 2000,
@@ -49,7 +50,6 @@
             "prompt": "Rewrite this code by replacing all the variable, method, and class names with related but not the same values. You need to keep snake case style. Here is the code:\n"
         },
         "edits": {
-            "model": "gpt-4",
             "temperature": 0.4,
             "top_p": 1,
             "max_tokens": 2000,
@@ -57,5 +57,13 @@
             "persona": "You are a nobody. You do whatever is the instruction",
             "prompt": ""
         },
-    }   
+    },
+    "__meta__":{
+        "target_prio_str_keys" : [ 
+            "prompt"
+        ],
+        "input_prio_keys" : [
+            "persona"
+        ]
+    }
 }
