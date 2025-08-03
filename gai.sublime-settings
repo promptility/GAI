@@ -19,35 +19,24 @@
             "top_p": 1,
             "max_tokens": 2000,
             "keep_prompt_text": true,
-            "prompt": "",
         },
         "generate": {
             "persona": "You are a helpful AI Assistant.",
             "keep_prompt_text": true,
         },
         "write": {
-            "temperature": 0.0,
-            "top_p": 1,
-            "max_tokens": 2000,
             "keep_prompt_text": false,
             "persona": "You are a python code generator. You only output the code.",
             "prompt": "Fill in the python code that is missing. You need to deduct from the function definition and the docstring provided:\n"
         },
         "whiten": {
-            "temperature": 0.0,
-            "top_p": 1,
-            "max_tokens": 2000,
             "keep_prompt_text": false,
             "persona": "You are a code generator. You only output the code.",
             "prompt": "Rewrite this code by replacing all the variable, method, and class names with related but not the same values. You need to keep snake case style. Here is the code:\n"
         },
         "edits": {
-            "temperature": 0.4,
-            "top_p": 1,
-            "max_tokens": 2000,
             "keep_prompt_text": false,
             "persona": "You are a nobody. You do whatever is the instruction",
-            "prompt": ""
         },
     },
     "__meta__":{
