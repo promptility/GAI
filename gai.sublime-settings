@@ -20,14 +20,6 @@
             "max_tokens": 2000,
             "keep_prompt_text": true,
             "prompt": "",
-            // "alternates": {
-            //     "gpt35": {
-            //         "default": "", // Do not prompt for alternate and do not replace the configuratoin in this
-            //         // "default": "gpt-35", // Uncomment if you want to set gpt35 as alternate
-            //         "model": "gpt-35",
-            //         "open_ai_endpoint": "<complete this with you endpoit configuration"
-            //     }
-            // }
         },
         "generate": {
             "persona": "You are a helpful AI Assistant.",
@@ -59,11 +51,19 @@
         },
     },
     "__meta__":{
+        // Merging default behaviour is to keep the most nested value
+        // 
+        // Different behaviour overrides available below
+        // Merging by putting the most nested values in front
         "target_prio_str_keys" : [ 
             "prompt"
         ],
+        // Merging by putting the least nested values in front
+        "input_prio_str_keys" : [
+        ],
+        // Merging by keeping the least nested values
         "input_prio_keys" : [
-            "persona"
+            
         ]
     }
 }
