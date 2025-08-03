@@ -216,6 +216,7 @@ class configurator():
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
 
+        print("Before selection configuration \n\n")
         print(self.__running_config__)
 
     def ready_wait(self, sleep_duration=0.2):
@@ -447,7 +448,11 @@ class async_code_generator(threading.Thread):
         }
         data = json.dumps(self.data)
 
+
         log_level = self.config_handle.get("log_level", None)
+
+        print("Configuration before execution of request \n\n")
+        print(self.config_handle.__running_config__)
 
         if log_level in ["requests", "all"]:
             logger.info("Request Headers: %s", json.dumps(headers, indent=4))
