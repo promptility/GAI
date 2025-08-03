@@ -193,7 +193,7 @@ class configurator():
                 alternates = self.__running_config__["alternates"]
                 config_override = alternates[config_name]
                 self.__running_config__ = populate_dict(
-                    config_override, self.__running_config__)
+                    self.__running_config__, config_override)
 
         def on_done(index):
             if index == -1:
