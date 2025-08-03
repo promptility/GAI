@@ -104,6 +104,9 @@ class configurator():
         self.source_config[section_name] = configurations.get(
             "commands", {}).get(section_name, {})
 
+        print("Source configuration")
+        print(self.source_config)
+
         # Read the section configuration
         self.__running_config__ = {}
         self.__running_config__["alternates"] = configurations.get(
