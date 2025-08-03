@@ -127,6 +127,7 @@ class configurator():
             return {k: check_dict(k) if k in input_dict.keys()
                     else target_dict[k] for k in keys}
 
+
         # Construct oai configuration from global and section
         default_oai = self.source_config["oai"]
         self.__running_config__ = populate_dict(
@@ -163,6 +164,8 @@ class configurator():
             alternates = self.__running_config__["alternates"]
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
+
+        print(self.__running_config__)
 
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
