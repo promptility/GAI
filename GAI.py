@@ -97,8 +97,7 @@ class configurator():
         self.cancelled = False  
 
         # Read Sublime Text configuration object
-        self.source_config = {}
-        self.source_config["oai"] = configurations.get("oai", {})
+        self.source_config = configurations.get("oai", {})
         self.source_config[section_name] = configurations.get(
             "commands", {}).get(section_name, {})
 
