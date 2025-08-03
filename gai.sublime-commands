@@ -1,7 +1,7 @@
 [
-    { "caption": "GAI: Generate text", "command": "complete_code_generator" },
+    { "caption": "GAI: Generate text", "command": "generate_code_generator" },
     { "caption": "GAI: Generate python code", "command": "write_code_generator" },
-    { "caption": "GAI: Whiten selected code", "command": "write_code_generator" },
+    { "caption": "GAI: Whiten selected code", "command": "whiten_code_generator" },
     { "caption": "GAI: Edit ...", "command": "edit_code_generator" },
     { "caption": "GAI: Settings", "command": "edit_gai_plugin_settings"}
 ]

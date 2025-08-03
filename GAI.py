@@ -96,11 +96,15 @@ class configurator():
 
         self.cancelled = False  
 
+        self.source_config__meta__ = configurations.get("__meta__", {})
+
         # Read Sublime Text configuration object
         self.source_config = {}
         self.source_config["oai"] = configurations.get("oai", {})
-        self.source_config[section_name] = configurations.get(
-            "commands", {}).get(section_name, {})
+        self.source_config[section_name] = configurations.get(section_name, {})
+
+        # print("Source configuration")
+        # print(self.source_config)
 
         # Read the section configuration
         self.__running_config__ = {}
@@ -112,20 +116,69 @@ class configurator():
     def __construct__running__config__(self):
 
         def populate_dict(input_dict, target_dict):
-            def check_dict(k):
-                if k in target_dict.keys() and \
-                        k not in input_dict.keys() and \
-                        not isinstance(target_dict[k], dict):
+
+            def merge_value(input_val, target_val, key):
+                # Consider merging different value types , e.g. string personas based on key
+
+                target_prio_str_keys = [ 
+                    "prompt"
+                ]
+                target_prio_str_keys = self.source_config__meta__.get("target_prio_str_keys", target_prio_str_keys)
+
+                input_prio_str_keys = self.source_config__meta__.get("target_prio_str_keys", [])
+
+                input_prio_keys = self.source_config__meta__.get("target_prio_str_keys", [])
+
+                if key in target_prio_str_keys:
+                    return target_val + "\n\n" + input_val
+                elif key in input_prio_str_keys:
+                    return input_val + "\n\n" + target_val
+                elif key in input_prio_keys:
+                    return input_val
+                else:
+                    return target_val
+
+
+            def merge_dict_value(lhs, rhs, k):
+                if isinstance(lhs,dict):
+                    dict_val = lhs
+                    val = rhs
+                else:
+                    dict_val = rhs
+                    val = lhs
+
+                merged = dict_val
+                merged[k] = val
+
+                return merged
+
+
+            def merge_dict(k):
+                # Return value if key ony exists in the target dictionary
+                if k in target_dict.keys() and k not in input_dict.keys():
                     return target_dict[k]
-                if isinstance(input_dict[k], dict):
-                    if k not in target_dict.keys():
-                        target_dict[k] = {}
-                    return populate_dict(input_dict[k], target_dict[k])
-                return input_dict[k]
+
+                # Return value if key only exists in the input dictionary 
+                if k in input_dict.keys() and k not in target_dict.keys():
+                    return input_dict[k]
+
+                # Merge value according to rules if key exists in both and is a value for both
+                if k in input_dict.keys() and k in target_dict.keys():
+                    if not isinstance(input_dict[k],dict) and not isinstance(target_dict[k], dict):
+                        return merge_value(input_dict[k], target_dict[k], k)
+
+                if k in input_dict.keys() and k in target_dict.keys():
+                    if isinstance(input_dict[k], dict) and isinstance(target_dict[k],dict):
+                        # Merge dictionaries if key exists in both an is a dictionary
+                        return populate_dict(input_dict[k], target_dict[k])
+                    elif isinstance(input_dict[k], dict) or isinstance(target_dict[k], dict):
+                        # Merge dictionary with value if key exists in both
+                        return merge_dict_value(input_dict[k],target_dict[k], k)
+
 
             keys = set(list(target_dict.keys()) + list(input_dict.keys()))
-            return {k: check_dict(k) if k in input_dict.keys()
-                    else target_dict[k] for k in keys}
+            return {k: merge_dict(k) for k in keys}
+
 
         # Construct oai configuration from global and section
         default_oai = self.source_config["oai"]
@@ -141,7 +194,7 @@ class configurator():
                 alternates = self.__running_config__["alternates"]
                 config_override = alternates[config_name]
                 self.__running_config__ = populate_dict(
-                    config_override, self.__running_config__)
+                    self.__running_config__, config_override)
 
         def on_done(index):
             if index == -1:
@@ -163,6 +216,9 @@ class configurator():
             alternates = self.__running_config__["alternates"]
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
+
+        # print("Before selection configuration \n\n")
+        # print(self.__running_config__)
 
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
@@ -267,13 +323,22 @@ class base_code_generator(code_generator):
         return ""
 
 
+class generate_code_generator(base_code_generator):
+
+    def run(self, edit):
+        super().base_execute(edit)
+
+    def code_generator_settings(self):
+        return "command_generate"
+
+
 class write_code_generator(base_code_generator):
 
     def run(self, edit):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "write"
+        return "command_write"
 
 
 class complete_code_generator(base_code_generator):
@@ -282,7 +347,7 @@ class complete_code_generator(base_code_generator):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "completions"
+        return "command_completions"
 
 
 class whiten_code_generator(base_code_generator):
@@ -291,7 +356,7 @@ class whiten_code_generator(base_code_generator):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "whiten"
+        return "command_whiten"
 
 
 class edit_code_generator(base_code_generator):
@@ -307,7 +372,7 @@ class edit_code_generator(base_code_generator):
         return "Instruction: " + self.instruction
 
     def code_generator_settings(self):
-        return "edits"
+        return "command_edits"
 
 
 class instruction_input_handler(sublime_plugin.TextInputHandler):
@@ -393,7 +458,11 @@ class async_code_generator(threading.Thread):
         }
         data = json.dumps(self.data)
 
+
         log_level = self.config_handle.get("log_level", None)
+
+        # print("Configuration before execution of request \n\n")
+        # print(self.config_handle.__running_config__)
 
         if log_level in ["requests", "all"]:
             logger.info("Request Headers: %s", json.dumps(headers, indent=4))
