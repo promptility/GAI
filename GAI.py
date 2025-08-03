@@ -103,8 +103,8 @@ class configurator():
         self.source_config["oai"] = configurations.get("oai", {})
         self.source_config[section_name] = configurations.get(section_name, {})
 
-        print("Source configuration")
-        print(self.source_config)
+        # print("Source configuration")
+        # print(self.source_config)
 
         # Read the section configuration
         self.__running_config__ = {}
@@ -217,8 +217,8 @@ class configurator():
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
 
-        print("Before selection configuration \n\n")
-        print(self.__running_config__)
+        # print("Before selection configuration \n\n")
+        # print(self.__running_config__)
 
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
@@ -461,8 +461,8 @@ class async_code_generator(threading.Thread):
 
         log_level = self.config_handle.get("log_level", None)
 
-        print("Configuration before execution of request \n\n")
-        print(self.config_handle.__running_config__)
+        # print("Configuration before execution of request \n\n")
+        # print(self.config_handle.__running_config__)
 
         if log_level in ["requests", "all"]:
             logger.info("Request Headers: %s", json.dumps(headers, indent=4))
