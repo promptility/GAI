@@ -6,38 +6,35 @@
         "open_ai_endpoint": "<put the completions endpoint here>",
         "max_seconds": 60,
         "log_level":"requests",
-        // "log_file": "/home/tron/sublime-requests.log"
-
+        // "log_file": "" // Set to an accessible directory
     },
     // "alternates":{
 
     // },
-    "commands": {
-        "completions": {
-            "model": "gpt-4",
-            "temperature": 0.0,
-            "top_p": 1,
-            "max_tokens": 2000,
-            "keep_prompt_text": true,
-        },
-        "generate": {
-            "persona": "You are a helpful AI Assistant.",
-            "keep_prompt_text": true,
-        },
-        "write": {
-            "keep_prompt_text": false,
-            "persona": "You are a python code generator. You only output the code.",
-            "prompt": "Fill in the python code that is missing. You need to deduct from the function definition and the docstring provided:\n"
-        },
-        "whiten": {
-            "keep_prompt_text": false,
-            "persona": "You are a code generator. You only output the code.",
-            "prompt": "Rewrite this code by replacing all the variable, method, and class names with related but not the same values. You need to keep snake case style. Here is the code:\n"
-        },
-        "edits": {
-            "keep_prompt_text": false,
-            "persona": "You are a nobody. You do whatever is the instruction",
-        },
+    "command_completions": {
+        "model": "gpt-4",
+        "temperature": 0.0,
+        "top_p": 1,
+        "max_tokens": 2000,
+        "keep_prompt_text": true,
+    },
+    "command_generate": {
+        "persona": "You are a helpful AI Assistant.",
+        "keep_prompt_text": true,
+    },
+    "command_write": {
+        "keep_prompt_text": false,
+        "persona": "You are a python code generator. You only output the code.",
+        "prompt": "Fill in the python code that is missing. You need to deduct from the function definition and the docstring provided:\n"
+    },
+    "command_whiten": {
+        "keep_prompt_text": false,
+        "persona": "You are a code generator. You only output the code.",
+        "prompt": "Rewrite this code by replacing all the variable, method, and class names with related but not the same values. You need to keep snake case style. Here is the code:\n"
+    },
+    "command_edits": {
+        "keep_prompt_text": false,
+        "persona": "You are a nobody. You do whatever is the instruction",
     },
     "__meta__":{
         // Merging default behaviour is to keep the most nested value

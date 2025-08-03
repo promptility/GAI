@@ -101,8 +101,7 @@ class configurator():
         # Read Sublime Text configuration object
         self.source_config = {}
         self.source_config["oai"] = configurations.get("oai", {})
-        self.source_config[section_name] = configurations.get(
-            "commands", {}).get(section_name, {})
+        self.source_config[section_name] = configurations.get(section_name, {})
 
         print("Source configuration")
         print(self.source_config)
@@ -330,7 +329,7 @@ class generate_code_generator(base_code_generator):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "generate"
+        return "command_generate"
 
 
 class write_code_generator(base_code_generator):
@@ -339,7 +338,7 @@ class write_code_generator(base_code_generator):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "write"
+        return "command_write"
 
 
 class complete_code_generator(base_code_generator):
@@ -348,7 +347,7 @@ class complete_code_generator(base_code_generator):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "completions"
+        return "command_completions"
 
 
 class whiten_code_generator(base_code_generator):
@@ -357,7 +356,7 @@ class whiten_code_generator(base_code_generator):
         super().base_execute(edit)
 
     def code_generator_settings(self):
-        return "whiten"
+        return "command_whiten"
 
 
 class edit_code_generator(base_code_generator):
@@ -373,7 +372,7 @@ class edit_code_generator(base_code_generator):
         return "Instruction: " + self.instruction
 
     def code_generator_settings(self):
-        return "edits"
+        return "command_edits"
 
 
 class instruction_input_handler(sublime_plugin.TextInputHandler):
