@@ -88,7 +88,9 @@ The populated list of the alternates configuration will be shown to the user whe
 
 ## Usage
 
-### Generate Text
+The plugin offers a set of commands to work content in GAI in a simple intuitive manner following the simplicity of Sublime Text phisolophy.
+
+### Generate Text command
 
 Select the portion of text that you want to send as context to the ai , inclusive of the command. 
 
@@ -96,13 +98,17 @@ Select the portion of text that you want to send as context to the ai , inclusiv
 For example suppose the text in the editor is:
 
 ```
-Writing clean and efficient code is crucial for any software development project. It not only improves readability but also reduces debugging time. Good coding practices can significantly enhance overall code quality.
+Writing clean and efficient code is crucial for any software development project. 
+It not only improves readability but also reduces debugging time. 
+Good coding practices can significantly enhance overall code quality.
 ```
 
 For which we want to expand on each phrase, then command to the large language model can be placed below.
 
 ```
-Writing clean and efficient code is crucial for any software development project. It not only improves readability but also reduces debugging time. Good coding practices can significantly enhance overall code quality.
+Writing clean and efficient code is crucial for any software development project. 
+It not only improves readability but also reduces debugging time. 
+Good coding practices can significantly enhance overall code quality.
 
 Please for each phrase add more relevant information
 
@@ -131,10 +137,49 @@ By emphasizing these aspects, developers can create software that is not only fu
 ```
 
 
-### Edit
-You could also utilize GAI to modify your code or text. The instruct window permits you to input an instruction. The simple the better. Highlight the specific piece of text or code you want to have altered and then bring-up the command pallet (ctrl+shift+p) to select 'GAI: Edit ..." .
+### Edit command
 
-You have the freedom to input any text at your editing instruction. Straightforward instructions are most effective. Too complex instructions may have unwanted or unpredictable results.
+The **Edit** command lets you ask the LLM to rewrite, refactor, or otherwise change a selected piece of code or text.  
+Just like the *Generate Text* workflow, you write the text you want to edit **but** the instruction that tells the model what to do is given on subsequent popup, and the result replaces the highlighted text.
+
+First, write the text you want to edit, and place the content you’d like to change in the editor.
+
+For example, suppose you have a small Python function that needs to be made more “Pythonic” and include type hints:
+
+```python
+def add(a,b):
+    return a+b
+```
 
 
+Select the whole block you want to change in place (code + instruction), highlight the section and invoke the command. Press **Ctrl + Shift + P** (or Cmd + Shift + P on macOS) to open the command palette, type **`gai edit`**, and choose **`GAI: Edit …`** from the list.
+
+In the subsequent palette input the instruction to the large language text that should be applied onto the text, for example:
+
+```text
+Add type hints and make the function conform to PEP‑8 style guidelines.
+```
+
+As before, subsequently you can select a model (just press enter to select your default), from a searchable list of available LLMs which will appear. Choose the one you prefer (e.g., `gpt‑4‑turbo`, `claude‑3‑sonnet`, etc.).
+
+The model will replace the selected text with the edited version. For the example above you might get:
+
+```python
+def add(a: int, b: int) -> int:
+    """Return the sum of two integers."""
+    return a + b
+```
+
+---
+
+### Tips for Best Results
+
+| ✅ Good practice | ❌ What to avoid |
+|------------------|-----------------|
+| Keep the instruction **short and explicit** – e.g., “Convert to async function and add error handling.” | Write long, compound instructions that mix several unrelated changes. |
+| Mention **only the changes you need**. | Ask the model to “improve everything” without specifying what “improve” means. |
+| If you need a specific style, **state it** – e.g., “Use snake_case for variable names.” | Assume the model knows your personal coding conventions. |
+| Include **any required context** (imports, surrounding code) in the selection. | Leave out code that the model might need to understand the change. |
+
+---
 
