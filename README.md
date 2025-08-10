@@ -1,24 +1,30 @@
 # GAI
 
-GAI is a Generative AI sublime text plugin. You can work alongside cutting edge AI to write code - automate the boilerplate, and
-focus on the creative side of coding. 
+GAI is an open‑source Sublime Text plugin that brings generative AI directly into your editor. It helps you generate boilerplate, refactor code, and explore creative solutions, letting you focus on the parts of development that matter most. Built with community contributions in mind, GAI is fully extensible, transparent, and free to use, and maintains full compatibility with the OpenAI API.
 
-You must have an account, and API key, and be authorized, to use[OpenAI's API](https://openai.com/blog/openai-api/). 
+It supports having multiple different endpoint configurations and selecting at runtime with fully asynchronous execution fully integrated in the command palette.
 
-It supports having multiple different endpoint configurations and selecting at runtime with fully asynchronous computation.
+
+1. **Generates boilerplate code**: Helps generate boilerplate code.
+2. **Refactors code**: Assists in refactoring code.
+3. **Explores creative solutions**: Enables exploring creative solutions.
+4. **Extensible**: Fully extensible with community contributions in mind.
+5. **Multiple endpoint configurations**: Supports having multiple different endpoint configurations.
+6. **Runtime endpoint selection**: Allows selecting endpoint configurations at runtime.
+7. **Asynchronous execution**: Executes tasks fully asynchronously.
+8. **Command palette integration**: Fully integrated in the Sublime Text command palette.
+9. **OpenAI API compatibility**: Maintains full compatibility with the OpenAI API.
+10. **Fully configurable**: Integrates naturally with Sublime Text configuration. 
+11. **Free to use**: Free to use.
 
 ![Concurrent execution with multiple configurations](./media/gai_demo_multi.gif)
 
-## Disclaimer
+## Tool Liability Disclaimer
 
-You are trusting an outside organization with the code you send them, and it is
-not encrypted - this cannot and should not be used for any kind of sensitive or
-otherwise regulated data according to local rules, directives, regulations, and
-any kind of other legally defining documents.
+Please keep in mind that code shared with an external partner is transmitted without encryption. For this reason, it should not be used for any sensitive or regulated information, in order to stay compliant with all applicable laws, regulations, and internal policies. If you need to exchange confidential data, please consider using an encrypted channel or a secure potentially on-prem/local alternative.
 
-By using this tool you understand that you and you alone is liable for any damage resulting by that use. This tool has not any defined intended use whatsoever and you the user use it at your own sole responsibility and bear any legal, financial, social, or any other possible responsibility.
+By using this tool, you acknowledge that you alone are liable for any damage resulting from its use. This tool has no defined intended purpose, and you, the user, assume full responsibility for all legal, financial, social, or other obligations arising from its use. Such responsibility extends to both the use of the tool and any resulting artifacts—including code, text, or other outputs in any format, whether executable or not. The authors of this tool assume no liability.
 
-This responsibility extends to both its use and artifacts, such as code, text, artifacts generated via those artifacts, in any format, be-it so executable or not, and the authors of this code have no responsibility whatsoever.
 
 ## Installation
 
