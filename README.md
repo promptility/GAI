@@ -2,7 +2,9 @@
 
 GAI is an open‑source Sublime Text plugin that brings generative AI directly into your editor. It helps you generate boilerplate, refactor code, and explore creative solutions, letting you focus on the parts of development that matter most. Built with community contributions in mind, GAI is fully extensible, transparent, and free to use, and maintains full compatibility with the OpenAI API.
 
-It supports having multiple different endpoint configurations and selecting at runtime with fully asynchronous execution fully integrated in the command palette.
+## Introduction
+
+The plugin supports having multiple different endpoint configurations and selecting at runtime with fully asynchronous execution fully integrated in the command palette.
 
 
 1. **Generates boilerplate code**: Helps generate boilerplate code.
@@ -28,8 +30,9 @@ By using this tool, you acknowledge that you alone are liable for any damage res
 
 ## Installation
 
+Currently this can only be installed via Github repository. Soon to be integrated in package control directly.
+
 ### Easy Install
-Currently this can only be installed via Github repository. 
 
 First you need to add this repository to package control.
 
@@ -46,8 +49,10 @@ Subsequently to install GAI:
 5. Search and download 'GAI'
 
 ## Configuration
-First: input your OpenAI API key in the Preferences->Package Settings->GAI. 
-Alternatively, use the command palette to bring up the settings (GAI: Settings). Do not edit the left side of , but place your settings on the right side.
+
+Input your OpenAI API key in the Preferences->Package Settings->GAI. 
+
+Prefered way use the command palette to bring up the settings (GAI: Settings). 
 
 The configuration is structured in a format that allows to customize easily both per command but also globally with multiple endpoints.
 
@@ -79,15 +84,57 @@ The configuration is structured in a format that allows to customize easily both
 }
 ```
 
-The populated list of the alternates configuration will be shows to the user when the "default" is not set.
+The populated list of the alternates configuration will be shown to the user when the "default" is not set.
 
-### Completion
+## Usage
 
-Write your function definition with a docstring possibly. Then highlight, and bring-up the command palette to selection 'GAI: Python code generation'.
+### Generate Text
 
+Select the portion of text that you want to send as context to the ai , inclusive of the command. 
+
+
+For example suppose the text in the editor is:
+
+```
+Writing clean and efficient code is crucial for any software development project. It not only improves readability but also reduces debugging time. Good coding practices can significantly enhance overall code quality.
+```
+
+For which we want to expand on each phrase, then command to the large language model can be placed below.
+
+```
+Writing clean and efficient code is crucial for any software development project. It not only improves readability but also reduces debugging time. Good coding practices can significantly enhance overall code quality.
+
+Please for each phrase add more relevant information
+
+```
+
+Subsequently selecting the entire piece of text the Generate Text command can be called through the command palette , search for GAI: Generate Text, e.g. typing `gagi` . Subsequently, select the model from the (searchable) list, and the result can look like:
+
+```
+Writing clean and efficient code is crucial for any software development project. It not only improves readability but also reduces debugging time. Good coding practices can significantly enhance overall code quality.
+
+Please for each phrase add more relevant information
+
+Here's an expanded version of the given text with additional relevant information for each phrase:
+
+1. **Writing clean and efficient code is crucial for any software development project.**
+   - Clean code is easy to understand and modify, making it easier for developers to collaborate and maintain the codebase over time. Efficient code, on the other hand, ensures that the application performs well, consumes fewer resources, and provides a better user experience. Both aspects are crucial for the success and scalability of a software project.
+
+2. **It not only improves readability but also reduces debugging time.**
+   - Readability is enhanced through the use of clear variable names, concise functions, and proper documentation, making it easier for developers to understand the code's intent and functionality. Reduced debugging time is a direct result of clean code practices, as fewer bugs are introduced, and issues are easier to identify and fix when they arise.
+
+3. **Good coding practices can significantly enhance overall code quality.**
+   - Good coding practices include following established coding standards, using version control effectively, writing modular and reusable code, and continuously refactoring to improve code structure and performance. By adhering to these practices, developers can ensure that their codebase remains maintainable, efficient, and adaptable to changing requirements.
+
+By emphasizing these aspects, developers can create software that is not only functional but also maintainable, efficient, and of high quality.
+
+```
 
 
 ### Edit
 You could also utilize GAI to modify your code or text. The instruct window permits you to input an instruction. The simple the better. Highlight the specific piece of text or code you want to have altered and then bring-up the command pallet (ctrl+shift+p) to select 'GAI: Edit ..." .
 
 You have the freedom to input any text at your editing instruction. Straightforward instructions are most effective. Too complex instructions may have unwanted or unpredictable results.
+
+
+
