@@ -66,12 +66,14 @@ class TestAsyncCodeGenerator:
         with patch('logging.StreamHandler') as mock_stream_handler_class, \
              patch('logging.getLogger') as mock_get_logger:
             
+            # Create actual mock StreamHandler instance
+            mock_stream_handler = Mock(spec=logging.StreamHandler)
+            mock_stream_handler_class.return_value = mock_stream_handler
+            
+            # Create mock logger with empty handlers
             mock_logger = Mock()
             mock_logger.handlers = []
             mock_get_logger.return_value = mock_logger
-            
-            mock_stream_handler = Mock()
-            mock_stream_handler_class.return_value = mock_stream_handler
             
             mock_config = Mock()
             mock_config.get.return_value = "debug"  # Any non-None value
@@ -89,12 +91,14 @@ class TestAsyncCodeGenerator:
         with patch('logging.FileHandler') as mock_file_handler_class, \
              patch('logging.getLogger') as mock_get_logger:
             
+            # Create actual mock FileHandler instance
+            mock_file_handler = Mock(spec=logging.FileHandler)
+            mock_file_handler_class.return_value = mock_file_handler
+            
+            # Create mock logger with empty handlers
             mock_logger = Mock()
             mock_logger.handlers = []
             mock_get_logger.return_value = mock_logger
-            
-            mock_file_handler = Mock()
-            mock_file_handler_class.return_value = mock_file_handler
             
             mock_config = Mock()
             mock_config.get.return_value = "test.log"  # File path
