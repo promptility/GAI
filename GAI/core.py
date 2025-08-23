@@ -8,9 +8,8 @@ import threading  # Added import for threading usage
 from abc import abstractmethod  # Needed for abstract methods
 
 from ._base import _base_text_command
-# Importing via ``GAI`` caused a circular import because ``GAI.__init__`` imports
-# this ``core`` module.  Importing directly from ``.config`` breaks the cycle.
-from .config import configurator
+# Importing via ``GAI`` caused a circular import because ``GAI.__init__``# this ``core`` module.  Importing directly from ``.config`` breaks the cycle.
+from .config import GAIConfig
 
 # Import async worker and logger to avoid undefined names
 from .async_worker import async_code_generator, logger
@@ -112,7 +111,7 @@ class base_code_generator(code_generator):
         configurations = sublime.load_settings('gai.sublime-settings')
         section_name = self.code_generator_settings()
 
-        config_handle = configurator(configurations, section_name, self)
+        config_handle = GAIConfig(configurations, section_name, self)
         # Wait for any quick‑panel selection (or default alternate) to finish
         config_handle.ready_wait()
 

@@ -7,7 +7,7 @@ sublime = importlib.import_module('sublime')
 from time import sleep  # Used by ready_wait
 
 
-class configurator():
+class GAIConfig():
     """
     Handles merging of global ``oai`` settings with command‑specific settings,
     applying priority rules defined in ``__meta__`` and handling ``alternates``.
@@ -28,7 +28,7 @@ class configurator():
         self.source_config[section_name] = configurations.get(section_name, {})
 
         # Initialise running configuration with alternates placeholder
-        self.__running_config__ = {}
+       .__running_config__ = {}
         self.__running_config__["alternates"] = configurations.get("alternates", {})
         self.__configuration__completed__ = False
 
@@ -152,7 +152,7 @@ class configurator():
             if index == -1:
                 self.cancelled = True
             else:
-                configs_list = ["__default__"]
+__default__"]
                 configs_list += list(alternates.keys())
                 selected_config = configs_list[index]
                 if selected_config != "__default__":
