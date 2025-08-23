@@ -1,18 +1,29 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import sys
+import threading
 
 # --- Mock 'sublime' and 'sublime_plugin' modules before importing GAI ---
 sys.modules['sublime'] = Mock(
     load_settings=Mock(),
     status_message=Mock(),
     active_window=Mock(),
-    Region=Mock(return_value=Mock())
+    Region=Mock(return_value=Mock()),
+    set_timeout=Mock()
 )
 sys.modules['sublime_plugin'] = Mock()
 
 # Import from the GAI directory structure
 import GAI.core
+from GAI.core import (
+    code_generator,
+    base_code_generator,
+    generate_code_generator,
+    write_code_generator,
+    complete_code_generator,
+    whiten_code_generator,
+    edit_code_generator
+)
 
 
 class MockSettings:
@@ -75,3 +86,194 @@ class TestCodeGenerator:
         cmd.view = mock_view
         with pytest.raises(ValueError):
             cmd.validate_setup()
+
+    def test_manage_thread_timeout(self, mock_view):
+        """Test manage_thread handles timeout"""
+        cmd = GAI.core.code_generator(mock_view)
+        cmd.view = mock_view
+        
+        # Create a mock thread that will timeout
+        mock_thread = Mock()
+        mock_thread.running = True
+        mock_thread.result = None
+        
+        # Test timeout behavior
+        cmd.manage_thread(mock_thread, 0, 0)  # max_time=0, seconds=0
+        
+        # Should show timeout message
+        mock_view.window().status_message.assert_called_with("Ran out of time! 0s")
+
+    def test_manage_thread_still_running(self, mock_view):
+        """Test manage_thread handles still running thread"""
+        cmd = GAI.core.code_generator(mock_view)
+        cmd.view = mock_view
+        
+        # Create a mock thread that is still running
+        mock_thread = Mock()
+        mock_thread.running = True
+        mock_thread.result = None
+        
+        # Test still running behavior with max_time > seconds
+        cmd.manage_thread(mock_thread, 5, 2)
+        
+        # Should show thinking message
+        mock_view.window().status_message.assert_called_with("Thinking, one moment... (2/5s)")
+        # Should set timeout for next check
+        sys.modules['sublime'].set_timeout.assert_called_once()
+
+    def test_manage_thread_completed_with_result(self, mock_view):
+        """Test manage_thread handles completed thread with result"""
+        cmd = GAI.core.code_generator(mock_view)
+        cmd.view = mock_view
+        
+        # Create a mock thread that has completed with result
+        mock_thread = Mock()
+        mock_thread.running = False
+        mock_thread.result = "generated code"
+        mock_thread.region.begin.return_value = 5
+        mock_thread.region.end.return_value = 15
+        mock_thread.text_replace = "prefix"
+        
+        # Test completed thread
+        cmd.manage_thread(mock_thread, 5, 2)
+        
+        # Should run replace_text command
+        cmd.view.run_command.assert_called_with('replace_text', {
+            "region": [5, 15],
+            "text": "prefixgenerated code"
+        })
+
+    def test_manage_thread_completed_without_result(self, mock_view):
+        """Test manage_thread handles completed thread without result"""
+        cmd = GAI.core.code_generator(mock_view)
+        cmd.view = mock_view
+        
+        # Create a mock thread that has completed without result
+        mock_thread = Mock()
+        mock_thread.running = False
+        mock_thread.result = None
+        
+        # Test completed thread without result
+        cmd.manage_thread(mock_thread, 5, 2)
+        
+        # Should show error message
+        mock_view.window().status_message.assert_called_with(
+            "Something is wrong, did not receive response - aborting")
+
+
+class TestBaseCodeGenerator:
+    
+    def test_base_execute_calls_validate_setup(self, mock_view):
+        """Test base_execute calls validate_setup"""
+        with patch('sublime.load_settings') as mock_load_settings:
+            mock_load_settings.return_value = {}
+            
+            # Create a concrete implementation of base_code_generator
+            class TestGenerator(GAI.core.base_code_generator):
+                def code_generator_settings(self):
+                    return "test_command"
+                
+                def additional_instruction(self):
+                    return ""
+            
+            cmd = TestGenerator(mock_view)
+            cmd.view = mock_view
+            
+            # Mock the validate_setup method to track if it's called
+            cmd.validate_setup = Mock()
+            
+            # Mock config to avoid actual quick panel
+            with patch('GAI.core.GAIConfig') as mock_config_class:
+                mock_config = Mock()
+                mock_config.__running_config__ = {"max_seconds": 60}
+                mock_config.is_cancelled.return_value = True  # Avoid actual thread start
+                mock_config_class.return_value = mock_config
+                
+                # Mock create_data to return a simple function
+                cmd.create_data = Mock(return_value=lambda x: None)
+                
+                try:
+                    cmd.base_execute(Mock())
+                except Exception:
+                    pass  # Expected since we're mocking many things
+                
+                # Verify validate_setup was called
+                cmd.validate_setup.assert_called_once()
+
+    def test_create_data_returns_await_function(self, mock_view):
+        """Test create_data returns a function that can await results"""
+        with patch('sublime.load_settings') as mock_load_settings:
+            mock_load_settings.return_value = {}
+            
+            class TestGenerator(GAI.core.base_code_generator):
+                def code_generator_settings(self):
+                    return "test_command"
+                
+                def additional_instruction(self):
+                    return ""
+            
+            cmd = TestGenerator(mock_view)
+            
+            # Create a mock config
+            mock_config = Mock()
+            mock_config.get_prompt.return_value = "Test prompt"
+            mock_config.get_persona.return_value = "Test persona"
+            mock_config.get_model.return_value = "gpt-3.5"
+            mock_config.get.return_value = 100  # max_tokens
+            
+            # Test create_data
+            await_function = cmd.create_data(mock_config, "test code")
+            
+            # Should return a function
+            assert callable(await_function)
+            
+            # The function should return None for both "data" and "text" initially
+            # (since the thread hasn't completed)
+            assert await_function("data") is None
+            assert await_function("text") is None
+
+
+class TestConcreteCodeGenerators:
+    
+    def test_generate_code_generator(self, mock_view):
+        """Test generate_code_generator settings"""
+        cmd = generate_code_generator(mock_view)
+        assert cmd.code_generator_settings() == "command_generate"
+    
+    def test_write_code_generator(self, mock_view):
+        """Test write_code_generator settings"""
+        cmd = write_code_generator(mock_view)
+        assert cmd.code_generator_settings() == "command_write"
+    
+    def test_complete_code_generator(self, mock_view):
+        """Test complete_code_generator settings"""
+        cmd = complete_code_generator(mock_view)
+        assert cmd.code_generator_settings() == "command_completions"
+    
+    def test_whiten_code_generator(self, mock_view):
+        """Test whiten_code_generator settings"""
+        cmd = whiten_code_generator(mock_view)
+        assert cmd.code_generator_settings() == "command_whiten"
+    
+    def test_edit_code_generator(self, mock_view):
+        """Test edit_code_generator settings"""
+        cmd = edit_code_generator(mock_view)
+        assert cmd.code_generator_settings() == "command_edits"
+        assert cmd.additional_instruction() == ""
+    
+    def test_edit_code_generator_with_instruction(self, mock_view):
+        """Test edit_code_generator with instruction"""
+        cmd = edit_code_generator(mock_view)
+        cmd.instruction = "translate to python"
+        assert cmd.additional_instruction() == "Instruction: translate to python"
+
+
+class TestInstructionInputHandler:
+    
+    def test_instruction_input_handler_methods(self):
+        """Test instruction_input_handler methods"""
+        from GAI.instruction import instruction_input_handler
+        handler = instruction_input_handler()
+        
+        assert handler.name() == "instruction"
+        assert handler.placeholder() == "E.g.: 'translate to java' or 'add documentation'"

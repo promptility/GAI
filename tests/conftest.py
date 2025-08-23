@@ -7,7 +7,8 @@ sys.modules['sublime'] = Mock(
     load_settings=Mock(),
     status_message=Mock(),
     active_window=Mock(),
-    Region=Mock(return_value=Mock())
+    Region=Mock(return_value=Mock()),
+    set_timeout=Mock()
 )
 sys.modules['sublime_plugin'] = Mock()
 
@@ -18,6 +19,9 @@ def mock_view():
     view.sel.return_value = [Mock(empty=lambda: False, begin=lambda: 0, end=lambda: 10)]
     view.substr.return_value = "print('hello')"
     view.replace = Mock()
+    view.window = Mock()
+    view.window.return_value = Mock()
+    view.window.return_value.status_message = Mock()
     return view
 
 
