@@ -16,7 +16,9 @@ sys.modules['sublime'] = Mock(
 )
 sys.modules['sublime_plugin'] = Mock()
 
-import GAI  # Replace with actual module name
+# Import from the GAI directory structure
+import GAI.config
+import GAI.core
 
 
 class MockSettings:
@@ -57,7 +59,7 @@ class TestCodeGenerator:
 
     def test_validate_setup_single_selection(self, mock_view):
         """Test validate_setup allows single non-empty selection"""
-        cmd = GAI.code_generator(mock_view)
+        cmd = GAI.core.code_generator(mock_view)
         cmd.view = mock_view
         try:
             cmd.validate_setup()
@@ -67,7 +69,7 @@ class TestCodeGenerator:
     def test_validate_setup_multiple_selections(self, mock_view):
         """validate_setup must raise when more than one region is selected"""
         mock_view.sel.return_value = [Mock(), Mock()]
-        cmd = GAI.code_generator(mock_view)
+        cmd = GAI.core.code_generator(mock_view)
         cmd.view = mock_view
         with pytest.raises(ValueError):
             cmd.validate_setup()
@@ -75,7 +77,7 @@ class TestCodeGenerator:
     def test_validate_setup_empty_selection(self, mock_view):
         """validate_setup must raise when the sole selection is empty"""
         mock_view.sel.return_value = [Mock(empty=lambda: True)]
-        cmd = GAI.code_generator(mock_view)
+        cmd = GAI.core.code_generator(mock_view)
         cmd.view = mock_view
         with pytest.raises(ValueError):
             cmd.validate_setup()
@@ -101,13 +103,13 @@ class TestConfigurator:
             }
         }
 
-        with patch('GAI.sublime.load_settings', return_value=MockSettings(source_config)):
-            config = GAI.GAIConfig(source_config, "command_edit", Mock())
-            config.ready_wait = lambda: None
-            config.__configuration__completed__ = True
+        mock_base_obj = Mock()
+        config = GAI.config.GAIConfig(source_config, "command_edit", mock_base_obj)
+        config.ready_wait = lambda: None
+        config.__configuration__completed__ = True
 
-            assert config.get_model() == "gpt-3.5-turbo"
-            assert config.get("temperature") == 0.3
+        assert config.get_model() == "gpt-3.5-turbo"
+        assert config.get("temperature") == 0.3
 
     def test_config_merge_with_priority_keys(self, mock_base_obj):
         """Test string merge with priority keys"""
@@ -123,14 +125,13 @@ class TestConfigurator:
             }
         }
 
-        with patch('GAI.sublime.load_settings', return_value=MockSettings(source_config)):
-            config = GAI.GAIConfig(source_config, "command_custom", mock_base_obj)
-            config.ready_wait = lambda: None
-            config.__configuration__completed__ = True
+        config = GAI.config.GAIConfig(source_config, "command_custom", mock_base_obj)
+        config.ready_wait = lambda: None
+        config.__configuration__completed__ = True
 
-            # "target_prio_str_keys" should concatenate base + custom prompts
-            expected_prompt = "Base prompt\n\nCustom prompt"
-            assert config.get_prompt() == expected_prompt
+        # "target_prio_str_keys" should concatenate base + custom prompts
+        expected_prompt = "Base prompt\n\nCustom prompt"
+        assert config.get_prompt() == expected_prompt
 
     def test_config_cancelled_via_quick_panel(self, mock_base_obj):
         """Test configurator returns cancelled when user cancels quick panel"""
@@ -147,11 +148,7 @@ class TestConfigurator:
         # Ensure the view's window().show_quick_panel uses our simulation
         mock_base_obj.view.window.return_value.show_quick_panel.side_effect = simulate_cancel
 
-        with patch('GAI.sublime.load_settings', return_value=MockSettings(source_config)):
-            config = GAI.GAIConfig(source_config, "command_test", mock_base_obj)
-            # The configurator runs the quick panel synchronously via the side effect,
-            # so we can directly check the cancelled flag.
-            assert config.is_cancelled() is True
-
-    # The rest of the test file remains unchanged; only the references to
-    # ``configurator`` have been updated to ``GAI.GAIConfig``.
+        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        # The configurator runs the quick panel synchronously via the side effect,
+        # so we can directly check the cancelled flag.
+        assert config.is_cancelled() is True
