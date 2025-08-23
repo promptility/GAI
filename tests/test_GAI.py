@@ -142,8 +142,15 @@ class TestConfigurator:
         }
 
         # Simulate the quick panel being shown and the user cancelling (index -1)
-        def simulate_cancel(items, on_done):
-            on_done(-1)
+        # Updated to accept the new parameter format with on_select
+        def simulate_cancel(items, on_select=None, **kwargs):
+            if on_select is not None:
+                on_select(-1)
+            else:
+                # Fallback for other parameter formats
+                on_done = kwargs.get('on_done')
+                if on_done is not None:
+                    on_done(-1)
 
         # Ensure the view's window().show_quick_panel uses our simulation
         mock_base_obj.view.window.return_value.show_quick_panel.side_effect = simulate_cancel
