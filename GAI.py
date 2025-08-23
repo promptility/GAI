@@ -16,7 +16,25 @@ logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-class code_generator(sublime_plugin.TextCommand):
+# ----------------------------------------------------------------------
+# Helper to provide a suitable base class for TextCommand‑like classes.
+# In the production environment ``sublime_plugin.TextCommand`` is a real
+# class, but in the test suite it is replaced by a ``Mock``.  Subclassing
+# a mock would turn the command classes into mocks and hide the actual
+# implementation.  This helper returns the real class when available,
+# otherwise falls back to ``object`` so that the code still works under
+# tests.
+# ----------------------------------------------------------------------
+def _base_text_command():
+    """Return a suitable base class for TextCommand‑like classes."""
+    return (
+        sublime_plugin.TextCommand
+        if isinstance(sublime_plugin.TextCommand, type)
+        else object
+    )
+
+
+class code_generator(_base_text_command()):
     """
     A class used to generate code using OpenAI.
 
@@ -30,6 +48,20 @@ class code_generator(sublime_plugin.TextCommand):
         Manages the running thread and checks if it's still running or if it
         has a result.
     """
+
+    def __init__(self, view):
+        """
+        The real Sublime Text ``TextCommand`` receives the view in its
+        constructor.  When we inherit from ``object`` (as the tests do)
+        we need to store the view ourselves.
+        """
+        # ``super()`` is safe – if the real TextCommand has an __init__
+        # it will be called, otherwise it is a no‑op.
+        try:
+            super().__init__(view)   # pragma: no‑cover
+        except Exception:           # pragma: no‑cover
+            pass
+        self.view = view
 
     def validate_setup(self):
         """
@@ -485,14 +517,16 @@ class async_code_generator(threading.Thread):
         return self.config_handle.get("max_seconds", 60)
 
 
-class replace_text_command(sublime_plugin.TextCommand):
-
+class replace_text_command(_base_text_command()):
     def run(self, edit, region, text):
         region = sublime.Region(*region)
         self.view.replace(edit, region, text)
 
 
-class edit_gai_plugin_settings_command(sublime_plugin.ApplicationCommand):
+class edit_gai_plugin_settings_command(
+        sublime_plugin.ApplicationCommand
+        if isinstance(sublime_plugin.ApplicationCommand, type)
+        else object):
     def run(self):
 
         sublime.run_command('new_window')
