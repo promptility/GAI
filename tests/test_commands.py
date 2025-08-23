@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 import sys
 
 # --- Mock 'sublime' and 'sublime_plugin' modules before importing GAI ---
