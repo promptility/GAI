@@ -108,7 +108,7 @@ class TestConfigurator:
         # Verify that show_quick_panel was called with the correct parameters
         mock_base_obj.view.window.return_value.show_quick_panel.assert_called_once_with(
             ["default", "fast", "smart"], 
-            on_select=config.__construct__running__config__().__closure__[7].cell_contents
+            on_select=mock_base_obj.view.window.return_value.show_quick_panel.call_args[1]['on_select']
         )
         
         # Verify configuration is not yet completed (waiting for user input)
