@@ -60,7 +60,7 @@ __all__ = [
     "whiten_code_generator",
     "edit_code_generator",
     "GAIConfig",
-    "replace_command",
+    "replace_text_command",
     "edit_gai_plugin_settings_command",
     "instruction_input_handler",
     "async_code_generator",

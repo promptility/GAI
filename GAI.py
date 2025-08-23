@@ -568,4 +568,4 @@ class edit_gai_plugin_settings_command(
 
         new_window.focus_group(1)
         new_window.run_command(
-            'write_file', {'file': '${packages}/User/gai.sublime-settings'})
+            'open_file', {'file': '${packages}/User/gai.sublime-settings'})
