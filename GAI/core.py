@@ -162,7 +162,7 @@ class base_code_generator(code_generator):
         prepthread = threading.Thread(target=async_prepare)
         prepthread.start()
 
-        def await(field):
+        def await_result(field):
             prepthread.join()
             return data_container.get(field)
 
