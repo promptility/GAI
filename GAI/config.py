@@ -6,6 +6,7 @@ sublime = importlib.import_module('sublime')
 
 from time import sleep  # Added import for sleep function used in ready_wait
 
+
 class configurator():
 
     def __init__(self, configurations, section_name, base_obj):
@@ -28,7 +29,7 @@ class configurator():
         self.__configuration__completed__ = False
         self.__construct__running__config__()
 
-    def __construct__running__config__(self):
+    def __construct__running__configself):
 
         def populate_dict(input_dict, target_dict):
 
@@ -57,7 +58,7 @@ class configurator():
             def merge_dict_value(lhs, rhs, k):
                 # Merge a dict with a scalar value (or vice‑versa)
                 if isinstance(lhs, dict):
-                    dict_val = lhs
+                    dict lhs
                     val = rhs
                 else:
                     dict_val = rhs
@@ -68,24 +69,47 @@ class configurator():
                 return merged
 
             def merge_dict(k):
-                # Return value if key only exists in one of the dict return target_dict[k]
+                """
+                Merge the value for a single key ``k`` from ``input_dict`` into
+                ``target_dict``.
+
+                The original implementation missed the case where the key
+                exists **only** in ``target_dict`` (e.g. the ``alternates`` key
+                when merging the global ``oai`` section).  In that situation the
+                function incorrectly fell through to the ``None`` fallback,
+                wiping out the existing value and breaking the configurator.
+
+                The corrected logic now:
+                1. If the key exists only in ``input_dict`` → return that value.
+                2. If the key exists only in ``target_dict`` → keep the target
+                   value.
+                3. If the key exists in both:
+                   * non‑dict values → apply the priority‑merge rules.
+                   * both dicts → recurse.
+                   * one dict / one scalar → merge appropriately.
+                """
+                # Key only in the input → take it.
                 if k in input_dict and k not in target_dict:
                     return input_dict[k]
 
-                # Both dicts contain the key
+                # Key only in the target → keep it.
+                if k in target_dict and k not in input_dict:
+                    return target_dict[k]
+
+                # Key present in both dictionaries.
                 if k in input_dict and k in target_dict:
-                    # Both values are non‑dicts → apply string/priority merge
+                    # Both values are non‑dicts → apply string/priority merge.
                     if not isinstance(input_dict[k], dict) and not isinstance(target_dict[k], dict):
                         return merge_value(input_dict[k], target_dict[k], k)
 
-                    # Both values are dicts → recurse
+                    # Both values are dicts → recurse.
                     if isinstance(input_dict[k], dict) and isinstance(target_dict[k], dict):
                         return populate_dict(input_dict[k], target_dict[k])
 
-                    # One dict, one scalar → merge appropriately
+                    # One dict, one scalar → merge appropriately.
                     return merge_dict_value(input_dict[k], target_dict[k], k)
 
-                # Fallback (should not happen)
+                # Fallback (should not happen).
                 return None
 
             keys = set(list(target_dict.keys()) + list(input_dict.keys()))
@@ -93,7 +117,7 @@ class configurator():
 
         # Construct oai configuration from global and section
         default_oai = self.source_config["oai"]
-        self.__running_config__ = populate_dict(
+        self.__running_config populate_dict(
             default_oai, self.__running_config__)
 
         # Merge the specific command section
