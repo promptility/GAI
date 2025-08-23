@@ -64,21 +64,21 @@ class TestCodeGenerator:
         except ValueError:
             pytest.fail("validate_setup raised ValueError unexpectedly")
 
-    # def test_validate_setup_multiple_selections(self, mock_view):
-    #     """Test validate_setup rejects multiple selections"""
-    #     mock_view.sel.return_value = [Mock(), Mock()]
-    #     cmd = GAI.code_generator(mock_view)
-    #     cmd.view = mock_view
-    #     with pytest.raises(ValueError):
-    #         cmd.validate_setup()
+    def test_validate_setup_multiple_selections(self, mock_view):
+        """validate_setup must raise when more than one region is selected"""
+        mock_view.sel.return_value = [Mock(), Mock()]
+        cmd = GAI.code_generator(mock_view)
+        cmd.view = mock_view
+        with pytest.raises(ValueError):
+            cmd.validate_setup()
 
-    # def test_validate_setup_empty_selection(self, mock_view):
-    #     """Test validate_setup rejects empty selection"""
-    #     mock_view.sel.return_value = [Mock(empty=lambda: True)]
-    #     cmd = GAI.code_generator(mock_view)
-    #     cmd.view = mock_view
-    #     with pytest.raises(ValueError):
-    #         cmd.validate_setup()
+    def test_validate_setup_empty_selection(self, mock_view):
+        """validate_setup must raise when the sole selection is empty"""
+        mock_view.sel.return_value = [Mock(empty=lambda: True)]
+        cmd = GAI.code_generator(mock_view)
+        cmd.view = mock_view
+        with pytest.raises(ValueError):
+            cmd.validate_setup()
 
 
 class TestConfigurator:
@@ -225,6 +225,33 @@ class TestBaseCodeGenerator:
             assert data['messages'][0]['content'] == "Coder"
             assert "Refactor: optimize x = 1" in data['messages'][1]['content']
 
+    def test_additional_instruction_edit_command(self, setup_base_generator):
+        """The edit command must prepend the user instruction correctly."""
+        mock_view, _ = setup_base_generator
+
+        class EditGen(GAI.edit_code_generator):
+            def code_generator_settings(self):
+                return "command_edits"
+            # `additional_instruction` is inherited – we only need to set `instruction`
+
+        # Simulate the TextInputHandler returning a string
+        edit_cmd = EditGen(mock_view)
+        edit_cmd.view = mock_view
+        edit_cmd.instruction = "make it async"
+
+        # Build a fake config that returns a simple prompt/persona
+        cfg = Mock()
+        cfg.__configuration__completed__ = True
+        cfg.get_prompt = lambda: "Prompt:"
+        cfg.get_persona = lambda: "Persona"
+        cfg.get_model = lambda: "gpt-4"
+        cfg.get = lambda k, d=None: {"keep_prompt_text": False}.get(k, d)
+
+        data_handle = edit_cmd.create_data(cfg, "def foo(): pass")
+        data = data_handle("data")
+        # The instruction must appear after the prompt and before the code
+        assert "Prompt: Instruction: make it async def foo(): pass" in data["messages"][1]["content"]
+
 
 class TestAsyncCodeGenerator:
 
@@ -293,15 +320,67 @@ class TestAsyncCodeGenerator:
         with pytest.raises(ValueError, match="Invalid API key"):
             thread.get_code_generator_response()
 
+    def test_logging_file_handler_added(self, monkeypatch):
+        """When a log_file is supplied a FileHandler must be attached exactly once."""
+        # Prepare a temporary file path
+        import tempfile, os
+        tmp_path = tempfile.NamedTemporaryFile(delete=False).name
+        os.unlink(tmp_path)   # we only need the name, not an existing file
+
+        cfg = Mock()
+        cfg.get.side_effect = lambda k, d=None: {
+            "open_ai_endpoint": "/chat/completions",
+            "open_ai_base": "api.openai.com",
+            "open_ai_key": "key",
+            "log_level": "all",
+            "log_file": tmp_path
+        }.get(k, d)
+        cfg.is_cancelled.return_value = False
+
+        data_handle = Mock(return_value={"data": {"messages": []}, "text": ""})
+
+        thread = GAI.async_code_generator(Mock(), cfg, data_handle)
+        # First call – should add the file handler
+        thread.setup_logs()
+        file_handlers = [h for h in GAI.logger.handlers if isinstance(h, logging.FileHandler)]
+        assert len(file_handlers) == 1
+        assert os.path.abspath(file_handlers[0].baseFilename) == os.path.abspath(tmp_path)
+
+        # Second call – should NOT add a second handler
+        thread.setup_logs()
+        file_handlers = [h for h in GAI.logger.handlers if isinstance(h, logging.FileHandler)]
+        assert len(file_handlers) == 1
+
+        # Clean up the temporary file if it was created by the handler
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
 
 # class TestReplaceTextCommand:
-
-#     def test_replace_text_runs_correctly(self, mock_view):
+#     @staticmethod
+#     def test_replace_text_runs_correctly(mock_view):
 #         """Test replace_text_command replaces region with text"""
 #         mock_edit = Mock()
 #         mock_region = Mock(begin=Mock(return_value=10), end=Mock(return_value=20))
 #         cmd = GAI.replace_text_command(mock_view)
-
+#
 #         cmd.run(mock_edit, region=mock_region, text="new code")
-
+#
 #         mock_view.replace.assert_called_once_with(mock_edit, mock_region, "new code")
+
+class TestReplaceTextCommand:
+
+    def test_replace_text_runs_correctly(self, mock_view):
+        """Validate that replace_text_command correctly replaces the given region."""
+        mock_edit = Mock()
+        # Sublime.Region is mocked in the test harness to return a mock object,
+        # but the command expects a tuple (begin, end).  We pass a tuple directly.
+        region_tuple = (5, 15)
+        cmd = GAI.replace_text_command(mock_view)
+        cmd.run(mock_edit, region=region_tuple, text="replaced")
+        # The view.replace call should receive a Region object (mocked) and the text.
+        mock_view.replace.assert_called_once()
+        args, kwargs = mock_view.replace.call_args
+        # args[0] is the edit, args[1] is the Region mock, args[2] is the text.
+        assert args[0] is mock_edit
+        assert args[2] == "replaced"
