@@ -93,12 +93,6 @@ class code_generator(_base_text_command()):
         })
 
 
-class configurator():
-    # (The class definition is now in config.py; this placeholder is kept
-    # for backward compatibility if any external code imported it from here.)
-    pass
-
-
 class base_code_generator(code_generator):
     """
     A base class for generating code. This class should be inherited by
