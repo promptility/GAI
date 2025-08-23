@@ -89,28 +89,6 @@ class TestConfigurator:
         base_obj.view = mock_view
         return base_obj
 
-    # def test_default_config_merge(self, mock_base_obj):
-    #     """Test basic config merge with defaults"""
-    #     source_config = {
-    #         "oai": {
-    #             "model": "gpt-3.5-turbo",
-    #             "temperature": 0.5,
-    #             "persona": "Default assistant"
-    #         },
-    #         "command_generate": {
-    #             "prompt": "Generate code:",
-    #             "temperature": 0.2
-    #         },
-    #         "__meta__": {}
-    #     }
-
-    #     with patch('GAI.sublime.load_settings', return_value=MockSettings(source_config)):
-    #         config = GAI.configurator(source_config, "command_generate", Mock())
-    #         config.ready_wait = lambda: None
-    #         config.__configuration__completed__ = True
-
-    #         assert ...
-
     def test_config_merge_with_alternates_default(self):
         """Test alternates with default override"""
         source_config = {
@@ -131,7 +109,7 @@ class TestConfigurator:
             assert config.get_model() == "gpt-3.5-turbo"
             assert config.get("temperature") == 0.3
 
-    def test_config_merge_with_priority_keys():
+    def test_config_merge_with_priority_keys(self, mock_base_obj):
         """Test string merge with priority keys"""
         source_config = {
             "__meta__": {
@@ -146,16 +124,34 @@ class TestConfigurator:
         }
 
         with patch('GAI.sublime.load_settings', return_value=MockSettings(source_config)):
-            config = GAI.GAIConfig(source_config, "command_custom", Mock())
+            config = GAI.GAIConfig(source_config, "command_custom", mock_base_obj)
             config.ready_wait = lambda: None
             config.__configuration__completed__ = True
 
-            assert ...
+            # "target_prio_str_keys" should concatenate base + custom prompts
+            expected_prompt = "Base prompt\n\nCustom prompt"
+            assert config.get_prompt() == expected_prompt
 
-    def test_config_cancelled_via_quick_panel():
-        """Test configurator returns cancelled when user 
-                                                                                                                         ---  ... ...
-"""
+    def test_config_cancelled_via_quick_panel(self, mock_base_obj):
+        """Test configurator returns cancelled when user cancels quick panel"""
+        source_config = {
+            "command_test": {
+                "alternates": {"debug": {"model": "debug"}}
+            }
+        }
+
+        # Simulate the quick panel being shown and the user cancelling (index -1)
+        def simulate_cancel(items, on_done):
+            on_done(-1)
+
+        # Ensure the view's window().show_quick_panel uses our simulation
+        mock_base_obj.view.window.return_value.show_quick_panel.side_effect = simulate_cancel
+
+        with patch('GAI.sublime.load_settings', return_value=MockSettings(source_config)):
+            config = GAI.GAIConfig(source_config, "command_test", mock_base_obj)
+            # The configurator runs the quick panel synchronously via the side effect,
+            # so we can directly check the cancelled flag.
+            assert config.is_cancelled() is True
 
     # The rest of the test file remains unchanged; only the references to
     # ``configurator`` have been updated to ``GAI.GAIConfig``.
