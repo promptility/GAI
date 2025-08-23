@@ -1,4 +1,5 @@
 import sublime
+from time import sleep  # Added import for sleep function used in ready_wait
 
 class configurator():
 
