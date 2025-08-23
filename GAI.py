@@ -23,12 +23,10 @@ class code_generator(sublime_plugin.TextCommand):
     Methods
     -------
     validate_setup():
-
         Validates the setup by checking the API key and the selected region of
         text.
 
     manage_thread(thread, seconds=0):
-
         Manages the running thread and checks if it's still running or if it
         has a result.
     """
@@ -103,9 +101,6 @@ class configurator():
         self.source_config["oai"] = configurations.get("oai", {})
         self.source_config[section_name] = configurations.get(section_name, {})
 
-        # print("Source configuration")
-        # print(self.source_config)
-
         # Read the section configuration
         self.__running_config__ = {}
         self.__running_config__["alternates"] = configurations.get(
@@ -118,73 +113,72 @@ class configurator():
         def populate_dict(input_dict, target_dict):
 
             def merge_value(input_val, target_val, key):
-                # Consider merging different value types , e.g. string personas based on key
-
-                target_prio_str_keys = [ 
-                    "prompt"
-                ]
-                target_prio_str_keys = self.source_config__meta__.get("target_prio_str_keys", target_prio_str_keys)
-
-                input_prio_str_keys = self.source_config__meta__.get("target_prio_str_keys", [])
-
-                input_prio_keys = self.source_config__meta__.get("target_prio_str_keys", [])
+                # Determine which priority lists apply for the current key
+                target_prio_str_keys = self.source_config__meta__.get(
+                    "target_prio_str_keys", [])
+                input_prio_str_keys = self.source_config__meta__.get(
+                    "input_prio_str_keys", [])
+                input_prio_keys = self.source_config__meta__.get(
+                    "input_prio_keys", [])
 
                 if key in target_prio_str_keys:
+                    # Target (global) value first, then input (more specific)
                     return target_val + "\n\n" + input_val
                 elif key in input_prio_str_keys:
+                    # Input (more specific) value first, then target
                     return input_val + "\n\n" + target_val
                 elif key in input_prio_keys:
+                    # Input overrides target completely
                     return input_val
                 else:
+                    # Default: keep target value
                     return target_val
 
-
             def merge_dict_value(lhs, rhs, k):
-                if isinstance(lhs,dict):
+                # Merge a dict with a scalar value (or vice‑versa)
+                if isinstance(lhs, dict):
                     dict_val = lhs
                     val = rhs
                 else:
                     dict_val = rhs
                     val = lhs
 
-                merged = dict_val
+                merged = dict(dict_val)  # copy to avoid mutating original
                 merged[k] = val
-
                 return merged
 
-
             def merge_dict(k):
-                # Return value if key ony exists in the target dictionary
-                if k in target_dict.keys() and k not in input_dict.keys():
+                # Return value if key only exists in one of the dicts
+                if k in target_dict and k not in input_dict:
                     return target_dict[k]
-
-                # Return value if key only exists in the input dictionary 
-                if k in input_dict.keys() and k not in target_dict.keys():
+                if k in input_dict and k not in target_dict:
                     return input_dict[k]
 
-                # Merge value according to rules if key exists in both and is a value for both
-                if k in input_dict.keys() and k in target_dict.keys():
-                    if not isinstance(input_dict[k],dict) and not isinstance(target_dict[k], dict):
+                # Both dicts contain the key
+                if k in input_dict and k in target_dict:
+                    # Both values are non‑dicts → apply string/priority merge
+                    if not isinstance(input_dict[k], dict) and not isinstance(target_dict[k], dict):
                         return merge_value(input_dict[k], target_dict[k], k)
 
-                if k in input_dict.keys() and k in target_dict.keys():
-                    if isinstance(input_dict[k], dict) and isinstance(target_dict[k],dict):
-                        # Merge dictionaries if key exists in both an is a dictionary
+                    # Both values are dicts → recurse
+                    if isinstance(input_dict[k], dict) and isinstance(target_dict[k], dict):
                         return populate_dict(input_dict[k], target_dict[k])
-                    elif isinstance(input_dict[k], dict) or isinstance(target_dict[k], dict):
-                        # Merge dictionary with value if key exists in both
-                        return merge_dict_value(input_dict[k],target_dict[k], k)
 
+                    # One dict, one scalar → merge appropriately
+                    return merge_dict_value(input_dict[k], target_dict[k], k)
+
+                # Fallback (should not happen)
+                return None
 
             keys = set(list(target_dict.keys()) + list(input_dict.keys()))
             return {k: merge_dict(k) for k in keys}
-
 
         # Construct oai configuration from global and section
         default_oai = self.source_config["oai"]
         self.__running_config__ = populate_dict(
             default_oai, self.__running_config__)
 
+        # Merge the specific command section
         section_config = self.source_config[self.__section_cursor__]
         self.__running_config__ = populate_dict(
             section_config, self.__running_config__)
@@ -214,11 +208,9 @@ class configurator():
             self.__configuration__completed__ = True
         else:
             alternates = self.__running_config__["alternates"]
+            # Show quick panel for user selection
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
-
-        # print("Before selection configuration \n\n")
-        # print(self.__running_config__)
 
     def ready_wait(self, sleep_duration=0.2):
         while not self.__configuration__completed__:
@@ -314,11 +306,11 @@ class base_code_generator(code_generator):
 
         return await_result
 
-    @ abstractmethod
+    @abstractmethod
     def code_generator_settings(self):
         pass
 
-    @ abstractmethod
+    @abstractmethod
     def additional_instruction(self):
         return ""
 
