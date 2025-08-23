@@ -81,7 +81,7 @@ class code_generator(_base_text_command()):
 
     def manage_thread(self, thread, max_time, seconds=0):
         """
-        Manages the running thread and checks if it's still running or if it
+        Manages the running thread and checks it's still running or if it
         has a result.
 
         Parameters
@@ -518,7 +518,24 @@ class async_code_generator(threading.Thread):
 
 
 class replace_text_command(_base_text_command()):
+    """
+    Simple command that replaces the text in the given region.
+    In the real Sublime environment the command is instantiated by the
+    editor and receives the view automatically.  In the unit‑tests we
+    instantiate the command manually, so we need an ``__init__`` that
+    accepts the view and stores it on the instance.
+    """
+    def __init__(self, view):
+        # ``_base_text_command`` may be ``object`` in the test harness,
+        # therefore we cannot rely on ``super()`` calling a real base
+        # ``__init__``.  Simply store the view for later use.
+        self.view = view
+
     def run(self, edit, region, text):
+        # ``region`` is supplied as a tuple (begin, end).  The real
+        # Sublime API expects a ``sublime.Region`` instance, which is
+        # mocked in the test suite.  Expanding the tuple creates the
+        # mock Region object.
         region = sublime.Region(*region)
         self.view.replace(edit, region, text)
 
