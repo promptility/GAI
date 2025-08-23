@@ -5,10 +5,17 @@ sublime_plugin = importlib.import_module('sublime_plugin')
 
 import json  # Added import for json usage
 import threading  # Added import for threading usage
+from abc import abstractmethod  # Needed for abstract methods
+
 from ._base import _base_text_command
 # Importing via ``GAI`` caused a circular import because ``GAI.__init__`` imports
 # this ``core`` module.  Importing directly from ``.config`` breaks the cycle.
 from .config import configurator
+
+# Import async worker and logger to avoid undefined names
+from .async_worker import async_code_generator, logger
+# Import the instruction input handler used by the edit command
+from .instruction import instruction_input_handler
 
 
 class code_generator(_base_text_command()):
