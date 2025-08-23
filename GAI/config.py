@@ -173,7 +173,7 @@ class configurator():
             # The view provides ``window()`` – works both in Sublime and in the
             # mocked test environment.
             self.base_obj.view.window().show_quick_panel(
-                ["default"] + list(alternates.keys()), on_select=on_done)
+                ["default"] + list(alternates.keys()), on_done=on_done)
 
     # ----------------------------------------------------------------------
     # Public accessor helpers

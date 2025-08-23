@@ -112,6 +112,8 @@ class base_code_generator(code_generator):
         section_name = self.code_generator_settings()
 
         config_handle = configurator(configurations, section_name, self)
+        # Wait for any quick‑panel selection (or default alternate) to finish
+        config_handle.ready_wait()
 
         selected_region = self.view.sel()[0]
         code_region = self.view.substr(selected_region)
