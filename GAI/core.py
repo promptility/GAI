@@ -6,7 +6,11 @@ sublime_plugin = importlib.import_module('sublime_plugin')
 import json  # Added import for json usage
 import threading  # Added import for threading usage
 from ._base import _base_text_command
-from .config import configurator
+# Import the public façade’s ``configurator`` – this is the class defined in
+# ``GAI/config.py`` that implements a three‑argument ``__init__``.
+# Importing it via the package ensures we don’t accidentally get the built‑in
+# ``object`` (which would raise “object() takes no parameters”).
+from GAI import configurator
 from .async_worker import async_code_generator, logger  # Imported logger for logging
 from .instruction import instruction_input_handler
 from abc import abstractmethod
