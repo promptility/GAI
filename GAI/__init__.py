@@ -6,7 +6,7 @@ re‑exported here so that external code (including the test‑suite) can still
 `import GAI` and access the same classes.
 """
 
-# Import the *top‑level* modules (they are patched by the test suite).
+# Import the *top-level* modules (they are patched by the test suite).
 import importlib
 import sys
 
@@ -39,7 +39,7 @@ from .core import (
 )
 
 # Config handling
-from .config import GAIConfig
+from .config import gai_config
 
 # Commands that are invoked directly by Sublime
 from .commands import replace_text_command, edit_gai_plugin_settings_command
@@ -59,7 +59,7 @@ __all__ = [
     "complete_code_generator",
     "whiten_code_generator",
     "edit_code_generator",
-    "GAIConfig",
+    "gai_config",
     "replace_text_command",
     "edit_gai_plugin_settings_command",
     "instruction_input_handler",
