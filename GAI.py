@@ -202,6 +202,7 @@ class configurator():
                 # Fallback (should not happen)
                 return None
 
+            # Merge all keys from both dictionaries.
             keys = set(list(target_dict.keys()) + list(input_dict.keys()))
             return {k: merge_dict(k) for k in keys}
 
@@ -526,16 +527,22 @@ class replace_text_command(_base_text_command()):
     accepts the view and stores it on the instance.
     """
     def __init__(self, view):
-        # ``_base_text_command`` may be ``object`` in the test harness,
-        # therefore we cannot rely on ``super()`` calling a real base
-        # ``__init__``.  Simply store the view for later use.
+        """
+        When the command is created Sublime (or the test harness) passes the
+        current view as the first argument.  If the base class is ``object``
+        (the case when the real Sublime API is not available) we cannot
+        call ``object.__init__`` with a parameter, so we simply store the
+        view ourselves.
+        """
+        # ``_base_text_command`` may be ``object`` in the test environment.
+        # Calling ``super().__init__(view)`` would raise ``TypeError``,
+        # therefore we skip the super‑call and just keep the view.
         self.view = view
 
     def run(self, edit, region, text):
-        # ``region`` is supplied as a tuple (begin, end).  The real
-        # Sublime API expects a ``sublime.Region`` instance, which is
-        # mocked in the test suite.  Expanding the tuple creates the
-        # mock Region object.
+        # ``region`` is supplied as a tuple (begin, end).  The
+        # real Sublime API expects a ``sublime.Region`` instance,
+        # which is mocked in the test suite.
         region = sublime.Region(*region)
         self.view.replace(edit, region, text)
 
@@ -561,4 +568,4 @@ class edit_gai_plugin_settings_command(
 
         new_window.focus_group(1)
         new_window.run_command(
-            'open_file', {'file': '${packages}/User/gai.sublime-settings'})
+            'write_file', {'file': '${packages}/User/gai.sublime-settings'})
