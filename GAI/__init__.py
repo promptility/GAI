@@ -8,6 +8,8 @@ re‑exported here so that external code (including the test‑suite) can still
 
 # Import the *top‑level* modules (they are patched by the test suite).
 import importlib
+import sys
+
 _sublime = importlib.import_module('sublime')
 _sublime_plugin = importlib.import_module('sublime_plugin')
 _http = importlib.import_module('http')
@@ -16,6 +18,13 @@ _http = importlib.import_module('http')
 sublime = _sublime
 sublime_plugin = _sublime_plugin
 http = _http
+
+# Register the submodule names so that ``patch('GAI.sublime…')`` and
+# ``patch('GAI.http.client…')`` resolve to the same objects that the tests
+# have mocked.
+sys.modules[__name__ + '.sublime'] = _sublime
+sys.modules[__name__ + '.sublime_plugin'] = _sublime_plugin
+sys.modules[__name__ + '.http'] = _http
 
 # Core generation machinery
 from .async_worker import async_code_generator, logger
