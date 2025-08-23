@@ -8,7 +8,8 @@ sys.modules['sublime'] = Mock(
     status_message=Mock(),
     active_window=Mock(),
     Region=Mock(return_value=Mock()),
-    set_timeout=Mock()
+    set_timeout=Mock(),
+    run_command=Mock()
 )
 sys.modules['sublime_plugin'] = Mock()
 

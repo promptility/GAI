@@ -47,9 +47,10 @@ class TestEditGaiPluginSettingsCommand:
         """Test edit_gai_plugin_settings_command run method"""
         cmd = GAI.commands.edit_gai_plugin_settings_command()
         
-        # Mock the active_window
+        # Mock the active_window and other sublime functions
         mock_window = Mock()
-        sys.modules['sublime'].active_window.return_value = mock_window
+        sys.modules['sublime'].active_window = Mock(return_value=mock_window)
+        sys.modules['sublime'].run_command = Mock()
         
         cmd.run()
         
