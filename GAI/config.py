@@ -1,5 +1,5 @@
 import importlib
-# NOTE: Import the *top‑level* ``sublime`` module (the tests replace it with a Mock).
+# NOTE: Import the *top-level* ``sublime`` module (the tests replace it with a Mock).
 # Using ``importlib.import_module`` guarantees we get the patched object,
 # not the ``GAI.sublime`` file that also exists in the package.
 sublime = importlib.import_module('sublime')
@@ -9,7 +9,7 @@ from time import sleep  # Used by ready_wait
 
 class GAIConfig():
     """
-    Handles merging of global ``oai`` settings with command‑specific settings,
+    Handles merging of global ``oai`` settings with command-specific settings,
     applying priority rules defined in ``__meta__`` and handling ``alternates``.
     """
 
@@ -41,10 +41,11 @@ class GAIConfig():
     def __construct__running__config__(self):
         """
         Build ``self.__running_config__`` by merging the global ``oai`` settings,
-        the command‑specific section, and any selected alternate configuration.
+        the command-specific section, and any selected alternate configuration.
         """
 
         def populate_dict(input_dict, target_dict):
+            """
             Recursively merge ``input_dict`` into ``target_dict`` according to
             the priority rules defined in ``__meta__``.
             """
@@ -73,7 +74,7 @@ class GAIConfig():
 
             def merge_dict_value(lhs, rhs, k):
                 """
-                Merge a dict with a scalar value (or vice‑versa) for key ``k``.
+                Merge a dict with a scalar value (or vice-versa) for key ``k``.
                 The scalar becomes the value for ``k`` in a copy of the dict.
                 """
                 if isinstance(lhs, dict):
@@ -102,7 +103,7 @@ class GAIConfig():
 
                 # Key present in both dictionaries.
                 if k in input_dict and k in target_dict:
-                    # Both values are non‑dicts → apply string/priority merge.
+                    # Both values are non-dict → apply string/priority merge.
                     if not isinstance(input_dict[k], dict) and not isinstance(target_dict[k], dict):
                         return merge_value(input_dict[k], target_dict[k], k)
 
@@ -128,7 +129,7 @@ class GAIConfig():
             default_oai, self.__running_config__)
 
         # ------------------------------------------------------------------
-        # Step 2: merge the command‑specific section
+        # Step 2: merge the command-specific section
         # ------------------------------------------------------------------
         section_config = self.source_config[self.__section_cursor__]
         self.__running_config__ = populate_dict(
@@ -145,7 +146,7 @@ class GAIConfig():
                     self.__running_config__, config_override)
 
         # ------------------------------------------------------------------
-        # Callback for the quick‑panel selection
+        # Callback for the quick-panel selection
         # ------------------------------------------------------------------
         def on_done(index):
             if index == -1:
