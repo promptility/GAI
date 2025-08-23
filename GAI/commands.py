@@ -1,5 +1,8 @@
-import sublime
-import sublime_plugin
+import importlib
+# Import the *real* (or mocked) top‑level modules.
+sublime = importlib.import_module('sublime')
+sublime_plugin = importlib.import_module('sublime_plugin')
+
 from ._base import _base_text_command
 
 class replace_text_command(_base_text_command()):

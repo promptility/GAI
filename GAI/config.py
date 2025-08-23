@@ -1,4 +1,9 @@
-import sublime
+import importlib
+# NOTE: Import the *top‑level* ``sublime`` module (the tests replace it with a Mock).
+# Using ``importlib.import_module`` guarantees we get the patched object,
+# not the ``GAI.sublime`` file that also exists in the package.
+sublime = importlib.import_module('sublime')
+
 from time import sleep  # Added import for sleep function used in ready_wait
 
 class configurator():
@@ -63,9 +68,7 @@ class configurator():
                 return merged
 
             def merge_dict(k):
-                # Return value if key only exists in one of the dicts
-                if k in target_dict and k not in input_dict:
-                    return target_dict[k]
+                # Return value if key only exists in one of the dict return target_dict[k]
                 if k in input_dict and k not in target_dict:
                     return input_dict[k]
 
@@ -123,7 +126,9 @@ class configurator():
             self.__configuration__completed__ = True
         else:
             alternates = self.__running_config__["alternates"]
-            # Show quick panel for user selection
+            # ``self.base_obj`` is a command object that already has a ``view``.
+            # The ``view`` provides ``window()`` – this works both in Sublime
+            # and in the mocked test environment.
             self.base_obj.view.window().show_quick_panel(
                 ["default"] + list(alternates.keys()), on_select=on_done)
 

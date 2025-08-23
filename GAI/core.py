@@ -1,5 +1,8 @@
-import sublime
-import sublime_plugin
+import importlib
+# Import the *real* (or mocked) top‑level modules.
+sublime = importlib.import_module('sublime')
+sublime_plugin = importlib.import_module('sublime_plugin')
+
 import json  # Added import for json usage
 import threading  # Added import for threading usage
 from ._base import _base_text_command
@@ -159,7 +162,7 @@ class base_code_generator(code_generator):
         prepthread = threading.Thread(target=async_prepare)
         prepthread.start()
 
-        def await_result(field):
+        def await(field):
             prepthread.join()
             return data_container.get(field)
 

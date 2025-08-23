@@ -1,9 +1,14 @@
-import sublime
+import importlib
+# Import the *top‑level* ``sublime`` module (the tests replace it with a Mock).
+sublime = importlib.import_module('sublime')
 import os
 import json
-import http.client
-import threading
 import logging
+
+# ``http`` is a standard‑library package; we import it via ``importlib`` so that
+# ``GAI.http.client`` points to the same object the tests patch.
+http = importlib.import_module('http')
+import threading
 
 # Create a logger (module‑level, shared)
 logger = logging.getLogger(__name__)
@@ -90,6 +95,9 @@ class async_code_generator(threading.Thread):
 
 
         log_level = self.config_handle.get("log_level", None)
+
+        # print("Configuration before execution of request \n\n")
+        # print(self.config_handle.__running_config__)
 
         if log_level in ["requests", "all"]:
             logger.info("Request Headers: %s", json.dumps(headers, indent=4))

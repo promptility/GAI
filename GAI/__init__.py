@@ -1,16 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-Package entry point for the GAI Sublime‑Text plugin.
+Package façade for the GAI Sublime‑Text plugin.
 All symbols that were previously defined in the single GAI.py file are
 re‑exported here so that external code (including the test‑suite) can still
 `import GAI` and access the same classes.
 """
 
-# logger is created in async_worker.py; we import it so that callers can
-# use GAI.logger if they want.
-from .async_worker import logger
+# Import the *top‑level* modules (they are patched by the test suite).
+import importlib
+_sublime = importlib.import_module('sublime')
+_sublime_plugin = importlib.import_module('sublime_plugin')
+_http = importlib.import_module('http')
+
+# Re‑export them under the expected names.
+sublime = _sublime
+sublime_plugin = _sublime_plugin
+http = _http
 
 # Core generation machinery
+from .async_worker import async_code_generator, logger
 from .core import (
     code_generator,
     base_code_generator,
@@ -31,6 +39,9 @@ from .commands import replace_text_command, edit_gai_plugin_settings_command
 from .instruction import instruction_input_handler
 
 __all__ = [
+    "sublime",
+    "sublime_plugin",
+    "http",
     "logger",
     "code_generator",
     "base_code_generator",
@@ -43,4 +54,5 @@ __all__ = [
     "replace_text_command",
     "edit_gai_plugin_settings_command",
     "instruction_input_handler",
+    "async_code_generator",
 ]
