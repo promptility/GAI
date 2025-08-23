@@ -28,7 +28,7 @@ class GAIConfig():
         self.source_config[section_name] = configurations.get(section_name, {})
 
         # Initialise running configuration with alternates placeholder
-       .__running_config__ = {}
+        self.__running_config__ = {}
         self.__running_config__["alternates"] = configurations.get("alternates", {})
         self.__configuration__completed__ = False
 
@@ -45,7 +45,6 @@ class GAIConfig():
         """
 
         def populate_dict(input_dict, target_dict):
-            """
             Recursively merge ``input_dict`` into ``target_dict`` according to
             the priority rules defined in ``__meta__``.
             """
@@ -152,7 +151,7 @@ class GAIConfig():
             if index == -1:
                 self.cancelled = True
             else:
-__default__"]
+                configs_list = ["__default__"]
                 configs_list += list(alternates.keys())
                 selected_config = configs_list[index]
                 if selected_config != "__default__":
