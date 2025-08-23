@@ -3,10 +3,11 @@ from unittest.mock import Mock, patch
 import sys
 
 # --- Mock 'sublime' and 'sublime_plugin' modules before importing GAI ---
-sys.modules['sublime'] = Mock(
-    run_command=Mock(),
-    active_window=Mock()
-)
+mock_sublime = Mock()
+mock_sublime.active_window = Mock()
+mock_sublime.run_command = Mock()
+
+sys.modules['sublime'] = mock_sublime
 sys.modules['sublime_plugin'] = Mock()
 
 # Import from the GAI directory structure
@@ -49,13 +50,13 @@ class TestEditGaiPluginSettingsCommand:
         
         # Mock the active_window and other sublime functions
         mock_window = Mock()
-        sys.modules['sublime'].active_window = Mock(return_value=mock_window)
-        sys.modules['sublime'].run_command = Mock()
+        mock_sublime.active_window.return_value = mock_window
+        mock_sublime.run_command.reset_mock()
         
         cmd.run()
         
         # Verify new_window command was run
-        sys.modules['sublime'].run_command.assert_called_once_with('new_window')
+        mock_sublime.run_command.assert_called_once_with('new_window')
         
         # Verify set_layout was called
         mock_window.run_command.assert_any_call('set_layout', {

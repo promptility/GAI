@@ -63,8 +63,8 @@ class TestAsyncCodeGenerator:
     def test_setup_logs_adds_stream_handler(self):
         """Test setup_logs adds stream handler when needed"""
         # Mock the logging classes properly
-        with patch('GAI.async_worker.logging.StreamHandler') as mock_stream_handler_class, \
-             patch('GAI.async_worker.logging.getLogger') as mock_get_logger:
+        with patch('logging.StreamHandler') as mock_stream_handler_class, \
+             patch('logging.getLogger') as mock_get_logger:
             
             mock_logger = Mock()
             mock_logger.handlers = []
@@ -86,8 +86,8 @@ class TestAsyncCodeGenerator:
 
     def test_setup_logs_adds_file_handler(self):
         """Test setup_logs adds file handler when needed"""
-        with patch('GAI.async_worker.logging.FileHandler') as mock_file_handler_class, \
-             patch('GAI.async_worker.logging.getLogger') as mock_get_logger:
+        with patch('logging.FileHandler') as mock_file_handler_class, \
+             patch('logging.getLogger') as mock_get_logger:
             
             mock_logger = Mock()
             mock_logger.handlers = []

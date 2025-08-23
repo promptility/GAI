@@ -4,13 +4,14 @@ import sys
 import threading
 
 # --- Mock 'sublime' and 'sublime_plugin' modules before importing GAI ---
-sys.modules['sublime'] = Mock(
-    load_settings=Mock(),
-    status_message=Mock(),
-    active_window=Mock(),
-    Region=Mock(return_value=Mock()),
-    set_timeout=Mock()
-)
+mock_sublime = Mock()
+mock_sublime.load_settings = Mock()
+mock_sublime.status_message = Mock()
+mock_sublime.active_window = Mock()
+mock_sublime.Region = Mock(return_value=Mock())
+mock_sublime.set_timeout = Mock()
+
+sys.modules['sublime'] = mock_sublime
 sys.modules['sublime_plugin'] = Mock()
 
 # Import from the GAI directory structure
@@ -44,7 +45,7 @@ def mock_view():
     view.replace = Mock()
     view.window = Mock()
     view.window.return_value = Mock()
-    view.window.return_value.status_message = Mock()
+    view.window.return_value.status_message = mock_sublime.status_message
     return view
 
 
@@ -104,7 +105,7 @@ class TestCodeGenerator:
         cmd.manage_thread(mock_thread, 0, 0)  # max_time=0, seconds=0
         
         # Should show timeout message
-        mock_view.window.return_value.status_message.assert_called_with("Ran out of time! 0s")
+        mock_sublime.status_message.assert_called_with("Ran out of time! 0s")
 
     def test_manage_thread_still_running(self, mock_view):
         """Test manage_thread handles still running thread"""
@@ -120,9 +121,9 @@ class TestCodeGenerator:
         cmd.manage_thread(mock_thread, 5, 2)
         
         # Should show thinking message
-        mock_view.window.return_value.status_message.assert_called_with("Thinking, one moment... (2/5s)")
+        mock_sublime.status_message.assert_called_with("Thinking, one moment... (2/5s)")
         # Should set timeout for next check
-        sys.modules['sublime'].set_timeout.assert_called_once()
+        mock_sublime.set_timeout.assert_called_once()
 
     def test_manage_thread_completed_with_result(self, mock_view):
         """Test manage_thread handles completed thread with result"""
@@ -160,7 +161,7 @@ class TestCodeGenerator:
         cmd.manage_thread(mock_thread, 5, 2)
         
         # Should show error message
-        mock_view.window.return_value.status_message.assert_called_with(
+        mock_sublime.status_message.assert_called_with(
             "Something is wrong, did not receive response - aborting")
 
 
