@@ -4,20 +4,23 @@ GAI is an open‑source Sublime Text plugin that brings generative AI directly i
 
 ## Introduction
 
-The plugin supports having multiple different endpoint configurations and selecting at runtime with fully asynchronous execution fully integrated in the command palette.
+GAI seamlessly integrates large language models like GPT-4, GPT-3.5, and other OpenAI-compatible endpoints directly into Sublime Text. The plugin supports multiple AI endpoint configurations, runtime model selection, and fully asynchronous execution integrated into the command palette. Transform your coding workflow with intelligent code generation, refactoring, completion, and editing capabilities.
 
 
-1. **Generates boilerplate code**: Helps generate boilerplate code.
-2. **Refactors code**: Assists in refactoring code.
-3. **Explores creative solutions**: Enables exploring creative solutions.
-4. **Extensible**: Fully extensible with community contributions in mind.
-5. **Multiple endpoint configurations**: Supports having multiple different endpoint configurations.
-6. **Runtime endpoint selection**: Allows selecting endpoint configurations at runtime.
-7. **Asynchronous execution**: Executes tasks fully asynchronously.
-8. **Command palette integration**: Fully integrated in the Sublime Text command palette.
-9. **OpenAI API compatibility**: Maintains full compatibility with the OpenAI API.
-10. **Fully configurable**: Integrates naturally with Sublime Text configuration. 
-11. **Free to use**: Free to use.
+1. **Code Generation**: Generate new code from scratch or expand existing code with AI assistance
+2. **Code Refactoring**: Intelligently rewrite and improve existing code based on instructions
+3. **Code Completion**: Get context-aware completions for partial code snippets
+4. **Code Whitening**: Clean up and standardize code formatting and style
+5. **Multi-Endpoint Support**: Configure multiple AI providers (OpenAI, Azure OpenAI, custom endpoints)
+6. **Runtime Model Selection**: Switch between different AI models on-the-fly via quick panel
+7. **Asynchronous Execution**: Non-blocking background processing prevents UI freezing
+8. **Command Palette Integration**: All commands accessible via Sublime's command palette
+9. **OpenAI API Compatible**: Works with any OpenAI-compatible API endpoint
+10. **Flexible Configuration**: Command-specific settings with inheritance and overrides
+11. **Token Usage Tracking**: Monitor AI usage with per-request token counts
+12. **Comprehensive Logging**: Debug requests/responses with configurable logging levels
+13. **Extensible Architecture**: Easy to extend with new commands and AI providers
+14. **Free and Open Source**: Completely free to use with transparent source code
 
 ![Concurrent execution with multiple configurations](./media/gai_demo_multi.gif)
 
