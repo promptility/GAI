@@ -54,7 +54,7 @@ class TestEditGaiPluginSettingsCommand:
         
         cmd.run()
         
-        # Verify set_layout was called
+        # Verify set_layout was called on the new window
         mock_window.run_command.assert_any_call('set_layout', {
             'cols': [0.0, 0.5, 1.0],
             'rows': [0.0, 1.0],

@@ -74,7 +74,7 @@ class code_generator(_base_text_command()):
         """
         window = self.view.window()
 
-        if seconds > max_time:
+        if seconds >= max_time:
             message = "Ran out of time! {}s".format(max_time)
             if window:
                 window.status_message(message)

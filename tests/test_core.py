@@ -107,8 +107,8 @@ class TestCodeGenerator:
         mock_window = Mock()
         mock_view.window.return_value = mock_window
         
-        # Test timeout behavior
-        cmd.manage_thread(mock_thread, 0, 0)  # max_time=0, seconds=0
+        # Test timeout behavior - use seconds=1 to trigger timeout
+        cmd.manage_thread(mock_thread, 0, 1)  # max_time=0, seconds=1
         
         # Should show timeout message
         mock_window.status_message.assert_called_with("Ran out of time! 0s")
