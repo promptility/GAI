@@ -48,25 +48,27 @@ class TestEditGaiPluginSettingsCommand:
         """Test edit_gai_plugin_settings_command run method"""
         cmd = GAI.commands.edit_gai_plugin_settings_command()
         
-        # Mock the active_window and other sublime functions
-        mock_new_window = Mock()
-        mock_sublime.active_window.return_value = mock_new_window
-        
-        cmd.run()
-        
-        # Verify set_layout was called on the new window
-        mock_new_window.run_command.assert_any_call('set_layout', {
-            'cols': [0.0, 0.5, 1.0],
-            'rows': [0.0, 1.0],
-            'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
-        })
-        
-        # Verify focus_group was called
-        mock_new_window.focus_group.assert_any_call(0)
-        mock_new_window.focus_group.assert_any_call(1)
-        
-        # Verify open_file was called for both files
-        mock_new_window.run_command.assert_any_call(
-            'open_file', {'file': '${packages}/GAI/gai.sublime-settings'})
-        mock_new_window.run_command.assert_any_call(
-            'open_file', {'file': '${packages}/User/gai.sublime-settings'})
+        # Mock the entire sublime module
+        with patch('GAI.commands.sublime') as mock_sublime_module:
+            mock_new_window = Mock()
+            mock_sublime_module.active_window.return_value = mock_new_window
+            mock_sublime_module.run_command = Mock()
+            
+            cmd.run()
+            
+            # Verify set_layout was called on the new window
+            mock_new_window.run_command.assert_any_call('set_layout', {
+                'cols': [0.0, 0.5, 1.0],
+                'rows': [0.0, 1.0],
+                'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
+            })
+            
+            # Verify focus_group was called
+            mock_new_window.focus_group.assert_any_call(0)
+            mock_new_window.focus_group.assert_any_call(1)
+            
+            # Verify open_file was called for both files
+            mock_new_window.run_command.assert_any_call(
+                'open_file', {'file': '${packages}/GAI/gai.sublime-settings'})
+            mock_new_window.run_command.assert_any_call(
+                'open_file', {'file': '${packages}/User/gai.sublime-settings'})
