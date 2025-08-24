@@ -4,6 +4,9 @@ sublime = importlib.import_module('sublime')
 sublime_plugin = importlib.import_module('sublime_plugin')
 
 from ._base import _base_text_command
+from .config import gai_config
+from .async_worker import async_code_generator, logger
+import json
 
 class replace_text_command(_base_text_command()):
     """
