@@ -10,6 +10,7 @@ mock_sublime.status_message = Mock()
 mock_sublime.active_window = Mock()
 mock_sublime.Region = Mock(return_value=Mock())
 mock_sublime.set_timeout = Mock()
+mock_sublime.run_command = Mock()
 
 sys.modules['sublime'] = mock_sublime
 sys.modules['sublime_plugin'] = Mock()
@@ -46,6 +47,7 @@ def mock_view():
     view.window = Mock()
     view.window.return_value = Mock()
     view.window.return_value.status_message = mock_sublime.status_message
+    view.run_command = mock_sublime.run_command
     return view
 
 
@@ -134,15 +136,14 @@ class TestCodeGenerator:
         mock_thread = Mock()
         mock_thread.running = False
         mock_thread.result = "generated code"
-        mock_thread.region.begin.return_value = 5
-        mock_thread.region.end.return_value = 15
+        mock_thread.region = Mock(begin=Mock(return_value=5), end=Mock(return_value=15))
         mock_thread.text_replace = "prefix"
         
         # Test completed thread
         cmd.manage_thread(mock_thread, 5, 2)
         
         # Should run replace_text command
-        cmd.view.run_command.assert_called_with('replace_text', {
+        mock_sublime.run_command.assert_called_with('replace_text', {
             "region": [5, 15],
             "text": "prefixgenerated code"
         })
