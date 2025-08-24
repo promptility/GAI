@@ -49,24 +49,24 @@ class TestEditGaiPluginSettingsCommand:
         cmd = GAI.commands.edit_gai_plugin_settings_command()
         
         # Mock the active_window and other sublime functions
-        mock_window = Mock()
-        mock_sublime.active_window.return_value = mock_window
+        mock_new_window = Mock()
+        mock_sublime.active_window.return_value = mock_new_window
         
         cmd.run()
         
         # Verify set_layout was called on the new window
-        mock_window.run_command.assert_any_call('set_layout', {
+        mock_new_window.run_command.assert_any_call('set_layout', {
             'cols': [0.0, 0.5, 1.0],
             'rows': [0.0, 1.0],
             'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
         })
         
         # Verify focus_group was called
-        mock_window.focus_group.assert_any_call(0)
-        mock_window.focus_group.assert_any_call(1)
+        mock_new_window.focus_group.assert_any_call(0)
+        mock_new_window.focus_group.assert_any_call(1)
         
         # Verify open_file was called for both files
-        mock_window.run_command.assert_any_call(
+        mock_new_window.run_command.assert_any_call(
             'open_file', {'file': '${packages}/GAI/gai.sublime-settings'})
-        mock_window.run_command.assert_any_call(
+        mock_new_window.run_command.assert_any_call(
             'open_file', {'file': '${packages}/User/gai.sublime-settings'})
