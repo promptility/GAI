@@ -76,14 +76,14 @@ class TestAsyncCodeGenerator:
             mock_get_logger.return_value = mock_logger
             
             mock_config = Mock()
-            mock_config.get.return_value = "debug"  # Any non-None value
+            mock_config.get.side_effect = lambda key, default=None: "debug" if key == "log_level" else default
             
             # Create thread and call setup_logs
             thread = async_code_generator(Mock(), mock_config, Mock())
             thread.setup_logs()
             
             # Verify stream handler was added - check if StreamHandler was instantiated
-            assert mock_stream_handler_class.call_count >= 1
+            mock_stream_handler_class.assert_called()
 
     def test_setup_logs_adds_file_handler(self):
         """Test setup_logs adds file handler when needed"""

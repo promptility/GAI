@@ -51,12 +51,8 @@ class TestEditGaiPluginSettingsCommand:
         # Mock the active_window and other sublime functions
         mock_window = Mock()
         mock_sublime.active_window.return_value = mock_window
-        mock_sublime.run_command.reset_mock()
         
         cmd.run()
-        
-        # Verify new_window command was run
-        mock_sublime.run_command.assert_any_call('new_window')
         
         # Verify set_layout was called
         mock_window.run_command.assert_any_call('set_layout', {

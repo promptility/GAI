@@ -103,11 +103,15 @@ class TestCodeGenerator:
         mock_thread.running = True
         mock_thread.result = None
         
+        # Mock the view's window and status_message
+        mock_window = Mock()
+        mock_view.window.return_value = mock_window
+        
         # Test timeout behavior
         cmd.manage_thread(mock_thread, 0, 0)  # max_time=0, seconds=0
         
         # Should show timeout message
-        mock_sublime.status_message.assert_called_with("Ran out of time! 0s")
+        mock_window.status_message.assert_called_with("Ran out of time! 0s")
 
     def test_manage_thread_still_running(self, mock_view):
         """Test manage_thread handles still running thread"""
@@ -119,11 +123,15 @@ class TestCodeGenerator:
         mock_thread.running = True
         mock_thread.result = None
         
+        # Mock the view's window and status_message
+        mock_window = Mock()
+        mock_view.window.return_value = mock_window
+        
         # Test still running behavior with max_time > seconds
         cmd.manage_thread(mock_thread, 5, 2)
         
         # Should show thinking message
-        mock_sublime.status_message.assert_called_with("Thinking, one moment... (2/5s)")
+        mock_window.status_message.assert_called_with("Thinking, one moment... (2/5s)")
         # Should set timeout for next check
         assert mock_sublime.set_timeout.called
 
@@ -158,11 +166,15 @@ class TestCodeGenerator:
         mock_thread.running = False
         mock_thread.result = None
         
+        # Mock the view's window and status_message
+        mock_window = Mock()
+        mock_view.window.return_value = mock_window
+        
         # Test completed thread without result
         cmd.manage_thread(mock_thread, 5, 2)
         
         # Should show error message
-        mock_sublime.status_message.assert_called_with(
+        mock_window.status_message.assert_called_with(
             "Something is wrong, did not receive response - aborting")
 
 
