@@ -46,55 +46,17 @@ class async_code_generator(threading.Thread):
         self.running = False
 
     def setup_logs(self):
-
-        def stream_handler_added():
-            # Check if any handler is a StreamHandler instance
-            for handler in logger.handlers:
-                # Use type checking that works with mocks
-                if hasattr(handler, '__class__') and handler.__class__.__name__ == 'StreamHandler':
-                    return True
-                try:
-                    if isinstance(handler, logging.StreamHandler):
-                        return True
-                except TypeError:
-                    # Handle case where logging.StreamHandler is mocked
-                    pass
-            return False
-
-        def same(cur_handler, lfile):
-            try:
-                cur_file = os.path.abspath(cur_handler.baseFilename)
-                return cur_file == os.path.abspath(lfile)
-            except (AttributeError, TypeError):
-                # Handle case where baseFilename is not available or is mocked
-                return False
-
-        def file_handler_added(logfile):
-            # Check if any handler is a FileHandler instance with the same file
-            for handler in logger.handlers:
-                # Use type checking that works with mocks
-                if hasattr(handler, '__class__') and handler.__class__.__name__ == 'FileHandler':
-                    if same(handler, logfile):
-                        return True
-                try:
-                    if isinstance(handler, logging.FileHandler) and same(handler, logfile):
-                        return True
-                except TypeError:
-                    # Handle case where logging.FileHandler is mocked
-                    pass
-            return False
-
-        # Add a stream handler if not already defined given configuration
-        if self.config_handle.get("log_level", None) is not None:
-            if not stream_handler_added():
-                stream_handler = logging.StreamHandler()
-                stream_handler.setFormatter(formatter)
-                logger.addHandler(stream_handler)
-
-        # Add a file handler if not already present given configuration
-        file_log_io = self.config_handle.get("log_file", None)
+        """Setup logging handlers based on configuration."""
         
-        if file_log_io is not None and not file_handler_added(file_log_io):
+        # Always add stream handler when log_level is configured
+        if self.config_handle.get("log_level", None) is not None:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setFormatter(formatter)
+            logger.addHandler(stream_handler)
+
+        # Add file handler if log_file is configured
+        file_log_io = self.config_handle.get("log_file", None)
+        if file_log_io is not None:
             try:
                 file_handler = logging.FileHandler(file_log_io)
                 self.logging_file_handler = file_handler

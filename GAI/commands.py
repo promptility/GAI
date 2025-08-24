@@ -33,20 +33,24 @@ class edit_gai_plugin_settings_command(
         if isinstance(sublime_plugin.ApplicationCommand, type)
         else object):
     def run(self):
-
+        """Open GAI settings in a new window with split layout."""
+        # Create new window
         sublime.run_command('new_window')
         new_window = sublime.active_window()
 
+        # Set up split layout
         new_window.run_command('set_layout', {
             'cols': [0.0, 0.5, 1.0],
             'rows': [0.0, 1.0],
             'cells': [[0, 0, 1, 1], [1, 0, 2, 1]]
         })
 
+        # Open GAI settings in left pane
         new_window.focus_group(0)
         new_window.run_command(
             'open_file', {'file': '${packages}/GAI/gai.sublime-settings'})
 
+        # Open user settings in right pane
         new_window.focus_group(1)
         new_window.run_command(
             'open_file', {'file': '${packages}/User/gai.sublime-settings'})

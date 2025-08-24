@@ -72,16 +72,23 @@ class code_generator(_base_text_command()):
         seconds : int, optional
             The number of seconds the thread has been running, by default 0.
         """
+        window = self.view.window()
 
         if seconds > max_time:
             message = "Ran out of time! {}s".format(max_time)
-            sublime.status_message(message)
+            if window:
+                window.status_message(message)
+            else:
+                sublime.status_message(message)
             return
 
         if thread.running:
             message = "Thinking, one moment... ({}/{}s)".format(
                 seconds, max_time)
-            sublime.status_message(message)
+            if window:
+                window.status_message(message)
+            else:
+                sublime.status_message(message)
             sublime.set_timeout(lambda:
                                 self.manage_thread(thread,
                                                    max_time,
@@ -89,8 +96,11 @@ class code_generator(_base_text_command()):
             return
 
         if not thread.result:
-            sublime.status_message(
-                "Something is wrong, did not receive response - aborting")
+            message = "Something is wrong, did not receive response - aborting"
+            if window:
+                window.status_message(message)
+            else:
+                sublime.status_message(message)
             return
 
         self.view.run_command('replace_text', {
