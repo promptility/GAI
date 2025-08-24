@@ -79,7 +79,7 @@ class TestGenerateTextCommand:
     def test_generate_text_command_init(self):
         """Test generate_text_command initialization"""
         mock_view = Mock()
-        cmd = GAI.commands.generate_code_generator(mock_view)
+        cmd = GAI.commands.generate_text_command(mock_view)
         assert cmd.view == mock_view
 
     def test_generate_text_command_run(self):
@@ -87,13 +87,16 @@ class TestGenerateTextCommand:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.generate_code_generator(mock_view)
+        cmd = GAI.commands.generate_text_command(mock_view)
         
         # Mock the base generator behavior
-        with patch('GAI.commands.base_code_generator.base_execute'):
-            cmd.base_execute = Mock()
-            
-            cmd.run(mock_edit)
-            
-            # Verify base_execute was called
-            cmd.base_execute.assert_called_once_with(mock_edit)
+        with patch('GAI.commands.generate_text_command.validate_setup'):
+            with patch('GAI.commands.generate_text_command.base_execute'):
+                cmd.validate_setup = Mock()
+                cmd.base_execute = Mock()
+                
+                cmd.run(mock_edit)
+                
+                # Verify validate_setup and base_execute were called
+                cmd.validate_setup.assert_called_once()
+                cmd.base_execute.assert_called_once_with(mock_edit)
