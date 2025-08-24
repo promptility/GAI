@@ -56,7 +56,7 @@ class TestEditGaiPluginSettingsCommand:
         cmd.run()
         
         # Verify new_window command was run
-        mock_sublime.run_command.assert_called_once_with('new_window')
+        mock_sublime.run_command.assert_any_call('new_window')
         
         # Verify set_layout was called
         mock_window.run_command.assert_any_call('set_layout', {

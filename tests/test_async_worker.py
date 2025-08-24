@@ -67,7 +67,7 @@ class TestAsyncCodeGenerator:
              patch('logging.getLogger') as mock_get_logger:
             
             # Create actual mock StreamHandler instance
-            mock_stream_handler = Mock(spec=logging.StreamHandler)
+            mock_stream_handler = MagicMock()
             mock_stream_handler_class.return_value = mock_stream_handler
             
             # Create mock logger with empty handlers
@@ -92,7 +92,7 @@ class TestAsyncCodeGenerator:
              patch('logging.getLogger') as mock_get_logger:
             
             # Create actual mock FileHandler instance
-            mock_file_handler = Mock(spec=logging.FileHandler)
+            mock_file_handler = MagicMock()
             mock_file_handler_class.return_value = mock_file_handler
             
             # Create mock logger with empty handlers

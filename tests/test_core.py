@@ -187,7 +187,7 @@ class TestBaseCodeGenerator:
             cmd.validate_setup = Mock()
             
             # Mock config to avoid actual quick panel
-            with patch('GAI.core.GAIConfig') as mock_config_class:
+            with patch('GAI.core.gai_config') as mock_config_class:
                 mock_config = Mock()
                 mock_config.__running_config__ = {"max_seconds": 60}
                 mock_config.is_cancelled.return_value = True  # Avoid actual thread start
@@ -233,9 +233,11 @@ class TestBaseCodeGenerator:
             
             # The function should return None for both "data" and "text" initially
             # (since the thread hasn't completed)
-            result = await_function("data")
             # In the current implementation, this will actually return the data immediately
             # because the mock returns it directly, so we check it's not None
+            result = await_function("data")
+            # In the actual implementation, this would block until the thread completes
+            # but in tests we're mocking it to return immediately
             assert result is not None
 
 

@@ -36,7 +36,7 @@ class TestConfigurator:
         }
 
         mock_base_obj = Mock()
-        config = GAI.config.GAIConfig(source_config, "command_edit", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_edit", mock_base_obj)
         config.ready_wait = lambda: None
         config.__configuration__completed__ = True
 
@@ -57,7 +57,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_custom", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_custom", mock_base_obj)
         config.ready_wait = lambda: None
         config.__configuration__completed__ = True
 
@@ -87,7 +87,7 @@ class TestConfigurator:
         # Ensure the view's window().show_quick_panel uses our simulation
         mock_base_obj.view.window.return_value.show_quick_panel.side_effect = simulate_cancel
 
-        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_test", mock_base_obj)
         # The configurator runs the quick panel synchronously via the side effect,
         # so we can directly check the cancelled flag.
         assert config.is_cancelled() is True
@@ -103,7 +103,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_test", mock_base_obj)
         
         # Verify that show_quick_panel was called with the correct parameters
         # Note: The order of items in the list is ["default", "fast", "smart"] based on dict keys
@@ -124,7 +124,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_test", mock_base_obj)
         
         # Verify that show_quick_panel was NOT called
         mock_base_obj.view.window.return_value.show_quick_panel.assert_not_called()
@@ -146,7 +146,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_custom", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_custom", mock_base_obj)
         config.ready_wait = lambda: None
         config.__configuration__completed__ = True
 
@@ -168,7 +168,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_custom", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_custom", mock_base_obj)
         config.ready_wait = lambda: None
         config.__configuration__completed__ = True
 
@@ -186,7 +186,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_custom", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_custom", mock_base_obj)
         config.ready_wait = lambda: None
         config.__configuration__completed__ = True
 
@@ -200,7 +200,7 @@ class TestConfigurator:
             "command_test": {}
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_test", mock_base_obj)
         config.ready_wait = lambda: None
         config.__configuration__completed__ = True
 
@@ -221,7 +221,7 @@ class TestConfigurator:
             }
         }
 
-        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_test", mock_base_obj)
         
         # Simulate completion after a short delay
         def complete_config():
@@ -256,7 +256,7 @@ class TestConfigurator:
             
         mock_base_obj.view.window.return_value.show_quick_panel.side_effect = capture_callback
 
-        config = GAI.config.GAIConfig(source_config, "command_test", mock_base_obj)
+        config = GAI.config.gai_config(source_config, "command_test", mock_base_obj)
         
         # Now simulate the user selecting index 1 ("fast" - but we need to check the actual order)
         if on_select_callback:
