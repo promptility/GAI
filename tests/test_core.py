@@ -133,7 +133,7 @@ class TestCodeGenerator:
         # Should show thinking message
         mock_window.status_message.assert_called_with("Thinking, one moment... (2/5s)")
         # Should set timeout for next check
-        assert mock_sublime.set_timeout.called
+        mock_sublime.set_timeout.assert_called()
 
     def test_manage_thread_completed_with_result(self, mock_view):
         """Test manage_thread handles completed thread with result"""
