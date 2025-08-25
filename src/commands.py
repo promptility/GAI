@@ -147,11 +147,16 @@ class gai_generate_text_command(_base_text_command()):
         return await_result
 
 
-class gai_edit_plugin_settings_command(sublime_plugin.ApplicationCommand):
+# The original implementation inherited from ``sublime_plugin.ApplicationCommand``.
+# In the test environment ``sublime_plugin`` is a simple ``Mock`` object, and
+# inheriting from it can interfere with method resolution.  The command does
+# not rely on any behaviour from the base class, so we make it a plain class.
+class gai_edit_plugin_settings_command:
     """
     Open GAI settings in a new window with split layout.
     """
     def run(self):
+        # Open a new window and configure a two‑column layout.
         sublime.run_command('new_window')
         new_window = sublime.active_window()
         new_window.run_command('set_layout', {
