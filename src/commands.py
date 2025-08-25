@@ -37,7 +37,7 @@ class gai_replace_text_command(_base_text_command()):
         self.view.replace(edit, region, text)
 
 
-class gai_generate_text_command(_base_text_command()):
+class gai_generate_text_command(sublime_plugin.TextCommand):
     """
     Command that generates or edits text via an LLM.
     """

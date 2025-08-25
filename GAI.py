@@ -6,8 +6,6 @@ from GAI.src.commands import (
     gai_edit_plugin_settings_command 
     )
 
-class gai_generate_text_command(sublime_plugin.TextCommand):
-    pass
 
 def plugin_loaded():
     print("GAI loaded!")
