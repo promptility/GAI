@@ -15,7 +15,7 @@ sys.modules['sublime_plugin'] = Mock()
 import GAI.config
 
 
-class TestConfigurator:
+class Test_configurator:
 
     @pytest.fixture
     def mock_base_obj(self, mock_view):
