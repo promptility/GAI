@@ -5,15 +5,15 @@ sublime_plugin = importlib.import_module('sublime_plugin')
 
 from ._base import _base_text_command
 from .config import gai_config
-from .async_worker import async_code_generator, logger
+from .async async_code_generator, logger
 import json
 
 class gai_replace_text_command(_base_text_command()):
     """
     Simple command that replaces the text in the given region.
     In the real Sublime environment the command is instantiated by the
-    editor and receives the view automatically.  In the unit‑tests we
-    instantiate the command manually, so we need an ``__init__`` that
+    editor and receives the view automatically.  The unit‑tests instantiate
+    the command manually, so we need an ``__init__`` that
     accepts the view and stores it on the instance.
     """
     def __init__(self, view):
@@ -23,7 +23,7 @@ class gai_replace_text_command(_base_text_command()):
         self.view = view
 
     def run(self, edit, region, text):
-        # ``region`` is supplied as a tuple (begin, end).  The real
+        # ``region`` is supplied as a tuple, end).  The real
         # Sublime API expects a ``sublime.Region`` instance, which is
         # mocked in the test suite.  Expanding the tuple creates the
         # mock Region object.
@@ -122,10 +122,12 @@ class gai_generate_text_command(_base_text_command()):
         max_tokens = config_handle.get('max_tokens', 100)
         temperature = config_handle.get('temperature', 0)
 
+        # NOTE: f‑strings are not supported in Sublime Text's Python 3.3
+        # runtime, so we use .format() for compatibility.
         data = {
             'messages': [
                 {'role': 'system', 'content': persona},
-                {'role': 'user', 'content': f"{prompt}\n{code_region}"}
+                {'role': 'user', 'content': "{}\n{}".format(prompt, code_region)}
             ],
             'model': model,
             'max_tokens': max_tokens,
@@ -145,8 +147,7 @@ class gai_generate_text_command(_base_text_command()):
 class gai_edit_plugin_settings_command(
         sublime_plugin.ApplicationCommand
         if isinstance(sublime_plugin.ApplicationCommand, type)
-        else object):
-    def run(self):
+           def run(self):
         """Open GAI settings in a new window with split layout."""
         sublime.run_command('new_window')
         new_window = sublime.active_window()
@@ -160,4 +161,4 @@ class gai_edit_plugin_settings_command(
             'open_file', {'file': '${packages}/GAI/gai.sublime-settings'})
         new_window.focus_group(1)
         new_window.run_command(
-            'open_file', {'file': '${packages}/User/gai.sublime-settings'})
+            'open_file', {'file':}/User/gai.sublime-settings'})
