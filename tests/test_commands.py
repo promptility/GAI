@@ -87,7 +87,7 @@ class TestGenerateTextCommand:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.gai_generate_text_command(mock_view)
+        cmd = GAI.commands.GaiGenerateTextCommand(mock_view)
         
         # Mock the base generator behavior
         with patch('GAI.commands.generate_text_command.validate_setup'):
