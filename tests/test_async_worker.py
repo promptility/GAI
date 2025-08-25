@@ -11,7 +11,7 @@ sys.modules['sublime'] = Mock()
 sys.modules['sublime_plugin'] = Mock()
 
 # Import from the GAI directory structure
-from GAI.async_worker import async_code_generator, logger
+from src.async_worker import async_code_generator, logger
 
 
 class Test_async_code_generator:

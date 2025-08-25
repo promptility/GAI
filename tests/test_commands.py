@@ -11,7 +11,7 @@ sys.modules['sublime'] = mock_sublime
 sys.modules['sublime_plugin'] = Mock()
 
 # Import from the GAI directory structure
-import GAI.commands
+import src.commands
 
 
 class Test_replace_text_command:
@@ -19,7 +19,7 @@ class Test_replace_text_command:
     def test_replace_text_command_init(self):
         """Test replace_text_command initialization"""
         mock_view = Mock()
-        cmd = GAI.commands.gai_replace_text_command(mock_view)
+        cmd = src.commands.gai_replace_text_command(mock_view)
         assert cmd.view == mock_view
 
     def test_replace_text_command_run(self):
@@ -27,10 +27,10 @@ class Test_replace_text_command:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.gai_replace_text_command(mock_view)
+        cmd = src.commands.gai_replace_text_command(mock_view)
         
         # Mock the Region constructor
-        with patch('GAI.commands.sublime.Region') as mock_region:
+        with patch('src.commands.sublime.Region') as mock_region:
             mock_region_instance = Mock()
             mock_region.return_value = mock_region_instance
             
@@ -46,10 +46,10 @@ class Test_edit_gai_plugin_settings_command:
 
     def test_edit_gai_plugin_settings_command_run(self):
         """Test edit_gai_plugin_settings_command run method"""
-        cmd = GAI.commands.gai_edit_plugin_settings_command()
+        cmd = src.commands.gai_edit_plugin_settings_command()
         
         # Mock the entire sublime module
-        with patch('GAI.commands.sublime') as mock_sublime_module:
+        with patch('src.commands.sublime') as mock_sublime_module:
             mock_new_window = Mock()
             mock_sublime_module.active_window.return_value = mock_new_window
             mock_sublime_module.run_command = Mock()
@@ -79,7 +79,7 @@ class Test_generate_text_command:
     def test_generate_text_command_init(self):
         """Test generate_text_command initialization"""
         mock_view = Mock()
-        cmd = GAI.commands.gai_generate_text_command(mock_view)
+        cmd = src.commands.gai_generate_text_command(mock_view)
         assert cmd.view == mock_view
 
     def test_generate_text_command_run(self):
@@ -87,7 +87,7 @@ class Test_generate_text_command:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.gai_generate_text_command(mock_view)
+        cmd = src.commands.gai_generate_text_command(mock_view)
         
         # Mock the methods directly on the command instance
         cmd.validate_setup = Mock()

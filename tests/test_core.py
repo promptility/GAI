@@ -16,8 +16,8 @@ sys.modules['sublime'] = mock_sublime
 sys.modules['sublime_plugin'] = Mock()
 
 # Import from the GAI directory structure
-import GAI.core
-from GAI.core import (
+import src.core
+from src.core import (
     code_generator,
     base_code_generator,
     generate_code_generator,
@@ -70,7 +70,7 @@ class Test_code_generator:
 
     def test_validate_setup_single_selection(self, mock_view):
         """Test validate_setup allows single non-empty selection"""
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         try:
             cmd.validate_setup()
@@ -80,7 +80,7 @@ class Test_code_generator:
     def test_validate_setup_multiple_selections(self, mock_view):
         """validate_setup must raise when more than one region is selected"""
         mock_view.sel.return_value = [Mock(), Mock()]
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         with pytest.raises(ValueError):
             cmd.validate_setup()
@@ -88,14 +88,14 @@ class Test_code_generator:
     def test_validate_setup_empty_selection(self, mock_view):
         """validate_setup must raise when the sole selection is empty"""
         mock_view.sel.return_value = [Mock(empty=lambda: True)]
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         with pytest.raises(ValueError):
             cmd.validate_setup()
 
     def test_manage_thread_timeout(self, mock_view):
         """Test manage_thread handles timeout"""
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         
         # Create a mock thread that will timeout
@@ -115,7 +115,7 @@ class Test_code_generator:
 
     def test_manage_thread_still_running(self, mock_view):
         """Test manage_thread handles still running thread"""
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         
         # Create a mock thread that is still running
@@ -128,7 +128,7 @@ class Test_code_generator:
         mock_view.window.return_value = mock_window
         
         # Patch the set_timeout to capture calls
-        with patch('GAI.core.sublime.set_timeout') as mock_set_timeout:
+        with patch('src.core.sublime.set_timeout') as mock_set_timeout:
             # Test still running behavior with max_time > seconds
             cmd.manage_thread(mock_thread, 5, 2)
             
@@ -139,7 +139,7 @@ class Test_code_generator:
 
     def test_manage_thread_completed_with_result(self, mock_view):
         """Test manage_thread handles completed thread with result"""
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         
         # Create a mock thread that has completed with result
@@ -160,7 +160,7 @@ class Test_code_generator:
 
     def test_manage_thread_completed_without_result(self, mock_view):
         """Test manage_thread handles completed thread without result"""
-        cmd = GAI.core.code_generator(mock_view)
+        cmd = src.core.code_generator(mock_view)
         cmd.view = mock_view
         
         # Create a mock thread that has completed without result
@@ -188,7 +188,7 @@ class Test_base_code_generator:
             mock_load_settings.return_value = {}
             
             # Create a concrete implementation of base_code_generator
-            class test_generator(GAI.core.base_code_generator):
+            class test_generator(src.core.base_code_generator):
                 def code_generator_settings(self):
                     return "test_command"
                 
@@ -202,7 +202,7 @@ class Test_base_code_generator:
             cmd.validate_setup = Mock()
             
             # Mock config to avoid actual quick panel
-            with patch('GAI.core.gai_config') as mock_config_class:
+            with patch('src.core.gai_config') as mock_config_class:
                 mock_config = Mock()
                 mock_config.__running_config__ = {"max_seconds": 60}
                 mock_config.is_cancelled.return_value = True  # Avoid actual thread start
@@ -224,7 +224,7 @@ class Test_base_code_generator:
         with patch('sublime.load_settings') as mock_load_settings:
             mock_load_settings.return_value = {}
             
-            class test_generator(GAI.core.base_code_generator):
+            class test_generator(src.core.base_code_generator):
                 def code_generator_settings(self):
                     return "test_command"
                 
@@ -297,8 +297,8 @@ class Test_instruction_input_handler:
     def test_instruction_input_handler_methods(self):
         """Test instruction_input_handler methods"""
         # Mock the base class properly
-        with patch('GAI.instruction.sublime_plugin.TextInputHandler'):
-            from GAI.instruction import instruction_input_handler
+        with patch('src.instruction.sublime_plugin.TextInputHandler'):
+            from src.instruction import instruction_input_handler
             handler = instruction_input_handler()
             
             # Mock the methods since they come from the base class
