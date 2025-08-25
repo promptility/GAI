@@ -1,7 +1,16 @@
 [
-    { "caption": "GAI: Generate text", "command": "GAI.gai_generate_text_command" },
+    {
+        "caption": "GAI: Generate text",
+        "command": "gai_generate_text_command"
+    },
+    {
+        "caption": "GAI: Edit ...",
+        "command": "gai_replace_text_command"
+    },
+    {
+        "caption": "GAI: Settings",
+        "command": "gai_edit_plugin_settings_command"
+    }
+]
     // { "caption": "GAI: Generate python code", "command": "write_code_generator" },
     // { "caption": "GAI: Whiten selected code", "command": "whiten_code_generator" },
-    { "caption": "GAI: Edit ...", "command": "gai_replace_text_command" },
-    { "caption": "GAI: Settings", "command": "gai_edit_plugin_settings_command"}
-]

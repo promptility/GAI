@@ -1,7 +1,23 @@
 {
     "name": "GAI",
     "version": "0.3-dev",
+    // "version": "",
+    "sublime_text": ">=4107",
+    "platforms": [
+        "*"
+    ],
+    "python_version": "3.8",
+    // "url": "",
+    // "issues": null,
+    // "author": [
+    //     ""
+    // ],
+
     "description": "Co-code and Co-write with Sublime Text using AI to co-write and co-code",
-    "platforms": ["*"],
-    "sublime_text": "*"
+    "labels": [],
+    "libraries": [],
+    // "install_time": 1749715933.0404298,
+    // "release_time": "2025-08-12 16:26:39",
+    // "upgrade_time": 1755949496.442007
 }
+
