@@ -7,7 +7,7 @@ sublime = importlib.import_module('sublime')
 from time import sleep  # Used by ready_wait
 
 
-class gai_config():
+class gai_config:
     """
     Handles merging of global ``oai`` settings with command-specific settings,
     applying priority rules defined in ``__meta__`` and handling ``alternates``.

@@ -5,7 +5,7 @@ GAI Sublime Text Plugin
 
 # Import core components
 from .async_worker import async_code_generator, logger
-from .config import gai_config
+# from .config import gai_config
 
 # Import commands that should be available in Sublime Text
 from .commands import gai_generate_text_command
