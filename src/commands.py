@@ -3,7 +3,10 @@ import importlib
 sublime = importlib.import_module('sublime')
 sublime_plugin = importlib.import_module('sublime_plugin')
 
-from ._base import _base_text_command
+from ._base import (
+    _base_text_command, 
+    _base_application_command
+    )
 from .config import gai_config
 # The async worker module provides the thread class and logger.
 from .async_worker import async_code_generator, logger
@@ -151,7 +154,7 @@ class gai_generate_text_command(_base_text_command()):
 # In the test environment ``sublime_plugin`` is a simple ``Mock`` object, and
 # inheriting from it can interfere with method resolution.  The command does
 # not rely on any behaviour from the base class, so we make it a plain class.
-class gai_edit_plugin_settings_command:
+class gai_edit_plugin_settings_command(_base_application_command()):
     """
     Open GAI settings in a new window with split layout.
     """
