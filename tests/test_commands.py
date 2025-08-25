@@ -19,7 +19,7 @@ class TestReplaceTextCommand:
     def test_replace_text_command_init(self):
         """Test replace_text_command initialization"""
         mock_view = Mock()
-        cmd = GAI.commands.replace_text_command(mock_view)
+        cmd = GAI.commands.GaiReplaceTextCommand(mock_view)
         assert cmd.view == mock_view
 
     def test_replace_text_command_run(self):
@@ -27,7 +27,7 @@ class TestReplaceTextCommand:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.replace_text_command(mock_view)
+        cmd = GAI.commands.gai_replace_text_command(mock_view)
         
         # Mock the Region constructor
         with patch('GAI.commands.sublime.Region') as mock_region:
@@ -46,7 +46,7 @@ class TestEditGaiPluginSettingsCommand:
 
     def test_edit_gai_plugin_settings_command_run(self):
         """Test edit_gai_plugin_settings_command run method"""
-        cmd = GAI.commands.edit_gai_plugin_settings_command()
+        cmd = GAI.commands.GaiEditPluginSettingsCommand()
         
         # Mock the entire sublime module
         with patch('GAI.commands.sublime') as mock_sublime_module:
@@ -79,7 +79,7 @@ class TestGenerateTextCommand:
     def test_generate_text_command_init(self):
         """Test generate_text_command initialization"""
         mock_view = Mock()
-        cmd = GAI.commands.generate_text_command(mock_view)
+        cmd = GAI.commands.GaiGenerateTextCommand(mock_view)
         assert cmd.view == mock_view
 
     def test_generate_text_command_run(self):
@@ -87,7 +87,7 @@ class TestGenerateTextCommand:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.generate_text_command(mock_view)
+        cmd = GAI.commands.gai_generate_text_command(mock_view)
         
         # Mock the base generator behavior
         with patch('GAI.commands.generate_text_command.validate_setup'):
