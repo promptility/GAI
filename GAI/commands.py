@@ -8,7 +8,7 @@ from .config import gai_config
 from .async_worker import async_code_generator, logger
 import json
 
-class replace_text_command(_base_text_command()):
+class GaiReplaceTextCommand(_base_text_command()):
     """
     Simple command that replaces the text in the given region.
     In the real Sublime environment the command is instantiated by the
@@ -31,7 +31,7 @@ class replace_text_command(_base_text_command()):
         self.view.replace(edit, region, text)
 
 
-class generate_text_command(_base_text_command()):
+class GaiGenerateTextCommand(_base_text_command()):
     """
     Command that generates or edits text via an LLM.
     """
@@ -101,7 +101,7 @@ class generate_text_command(_base_text_command()):
         return await_result
 
 
-class edit_gai_plugin_settings_command(
+class GaiEditPluginSettingsCommand(
         sublime_plugin.ApplicationCommand
         if isinstance(sublime_plugin.ApplicationCommand, type)
         else object):
