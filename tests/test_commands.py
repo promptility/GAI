@@ -27,7 +27,7 @@ class TestReplaceTextCommand:
         mock_view = Mock()
         mock_edit = Mock()
         
-        cmd = GAI.commands.gai_replace_text_command(mock_view)
+        cmd = GAI.commands.GaiReplaceTextCommand(mock_view)
         
         # Mock the Region constructor
         with patch('GAI.commands.sublime.Region') as mock_region:
