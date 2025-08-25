@@ -14,7 +14,7 @@ sys.modules['sublime_plugin'] = Mock()
 import GAI.commands
 
 
-class test_replace_text_command:
+class Test_replace_text_command:
 
     def test_replace_text_command_init(self):
         """Test replace_text_command initialization"""
@@ -42,7 +42,7 @@ class test_replace_text_command:
             mock_view.replace.assert_called_once_with(mock_edit, mock_region_instance, "new text")
 
 
-class test_edit_gai_plugin_settings_command:
+class Test_edit_gai_plugin_settings_command:
 
     def test_edit_gai_plugin_settings_command_run(self):
         """Test edit_gai_plugin_settings_command run method"""
@@ -74,7 +74,7 @@ class test_edit_gai_plugin_settings_command:
                 'open_file', {'file': '${packages}/User/gai.sublime-settings'})
 
 
-class test_generate_text_command:
+class Test_generate_text_command:
 
     def test_generate_text_command_init(self):
         """Test generate_text_command initialization"""

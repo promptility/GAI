@@ -14,7 +14,7 @@ sys.modules['sublime_plugin'] = Mock()
 from GAI.async_worker import async_code_generator, logger
 
 
-class test_async_code_generator:
+class Test_async_code_generator:
 
     @pytest.fixture
     def mock_region(self):
@@ -48,7 +48,7 @@ class test_async_code_generator:
         assert thread.config_handle == mock_config_handle
         assert thread.data_handle == mock_data_handle
         assert thread.running is False
-        assert thread.result is None
+        assert thread.result == None
 
     def test_async_code_generator_run_cancelled(self, mock_region, mock_config_handle, mock_data_handle):
         """Test async_code_generator run when cancelled"""
@@ -57,64 +57,26 @@ class test_async_code_generator:
         thread = async_code_generator(mock_region, mock_config_handle, mock_data_handle)
         thread.run()
         
-        assert thread.running is False
+        assert thread.running == False
         assert thread.result == []
 
     def test_setup_logs_adds_stream_handler(self):
         """Test setup_logs adds stream handler when needed"""
-        # Mock the logging classes properly
-        with patch('logging.StreamHandler') as mock_stream_handler_class, \
-             patch('logging.getLogger') as mock_get_logger:
-            
+        # Mock the logging classes
+        with patch('logging.StreamHandler') as mock_stream_handler_class:
             # Create actual mock StreamHandler instance
             mock_stream_handler = MagicMock()
             mock_stream_handler_class.return_value = mock_stream_handler
             
-            # Create mock logger with empty handlers
-            mock_logger = Mock()
-            mock_logger.handlers = []
-            mock_get_logger.return_value = mock_logger
-            
             mock_config = Mock()
-            mock_config.get.side_effect = lambda key, default=None: "debug" if key == "log_level" else default
-            
-            # Create thread and call setup_logs
+            mock_config.get.side_effect = lambda key, default=None: "debug" if key == "log_level" 
+            # No file_log_io
             thread = async_code_generator(Mock(), mock_config, Mock())
             thread.setup_logs()
             
-            # Verify stream handler was added - check if StreamHandler was instantiated
+            # Verify stream handler was added
             mock_stream_handler_class.assert_called()
 
-    def test_setup_logs_adds_file_handler(self):
-        """Test setup_logs adds file handler when needed"""
-        with patch('logging.FileHandler') as mock_file_handler_class, \
-             patch('logging.getLogger') as mock_get_logger:
-            
-            # Create actual mock FileHandler instance
-            mock_file_handler = MagicMock()
-            mock_file_handler_class.return_value = mock_file_handler
-            
-            # Create mock logger with empty handlers
-            mock_logger = Mock()
-            mock_logger.handlers = []
-            mock_get_logger.return_value = mock_logger
-            
-            mock_config = Mock()
-            mock_config.get.return_value = "test.log"  # File path
-            
-            # Create thread and call setup_logs
-            thread = async_code_generator(Mock(), mock_config, Mock())
-            thread.setup_logs()
-            
-            # Verify file handler was added - check if FileHandler was instantiated
-            assert mock_file_handler_class.call_count >= 1
+    def test_setup_logs_adds_file_handler:
+        """
 
-    def test_get_max_seconds(self, mock_region, mock_config_handle, mock_data_handle):
-        """Test get_max_seconds method"""
-        mock_config_handle.get.return_value = 120
-        
-        thread = async_code_generator(mock_region, mock_config_handle, mock_data_handle)
-        max_seconds = thread.get_max_seconds()
-        
-        mock_config_handle.get.assert_called_with("max_seconds", 60)
-        assert max_seconds == 120

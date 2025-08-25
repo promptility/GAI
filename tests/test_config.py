@@ -15,7 +15,7 @@ sys.modules['sublime_plugin'] = Mock()
 import GAI.config
 
 
-class test_configurator:
+class Test_configurator:
 
     @pytest.fixture
     def mock_base_obj(self, mock_view):
@@ -247,7 +247,7 @@ class test_configurator:
             }
         }
 
-        # Capture the on_select callback to simulate user selection
+        # Capture the on_select callback
         on_select_callback = None
         
         def capture_callback(items, on_select=None, **kwargs):
