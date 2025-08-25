@@ -8,9 +8,9 @@ from .async_worker import async_code_generator, logger
 from .config import gai_config
 
 # Import commands that should be available in Sublime Text
-from .commands import generate_text_command
-from .commands import replace_text_command  
-from .commands import edit_gai_plugin_settings_command
+from .commands import GaiGenerateTextCommand
+from .commands import GaiReplaceTextCommand  
+from .commands import GaiEditPluginSettingsCommand
 
 # Import core generators
 from .core import (
