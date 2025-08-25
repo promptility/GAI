@@ -89,14 +89,12 @@ class TestGenerateTextCommand:
         
         cmd = GAI.commands.GaiGenerateTextCommand(mock_view)
         
-        # Mock the base generator behavior
-        with patch('GAI.commands.generate_text_command.validate_setup'):
-            with patch('GAI.commands.generate_text_command.base_execute'):
-                cmd.validate_setup = Mock()
-                cmd.base_execute = Mock()
-                
-                cmd.run(mock_edit)
-                
-                # Verify validate_setup and base_execute were called
-                cmd.validate_setup.assert_called_once()
-                cmd.base_execute.assert_called_once_with(mock_edit)
+        # Mock the methods directly on the command instance
+        cmd.validate_setup = Mock()
+        cmd.base_execute = Mock()
+        
+        cmd.run(mock_edit)
+        
+        # Verify validate_setup and base_execute were called
+        cmd.validate_setup.assert_called_once()
+        cmd.base_execute.assert_called_once_with(mock_edit)
