@@ -14,7 +14,7 @@ sys.modules['sublime_plugin'] = Mock()
 from GAI.async_worker import async_code_generator, logger
 
 
-class TestAsyncCodeGenerator:
+class test_async_code_generator:
 
     @pytest.fixture
     def mock_region(self):

@@ -28,7 +28,7 @@ from GAI.core import (
 )
 
 
-class MockSettings:
+class mock_settings:
     """Mock for sublime.Settings object"""
 
     def __init__(self, data):
@@ -66,7 +66,7 @@ def setup_base_generator(mock_view, mock_region):
     return mock_view, mock_region
 
 
-class TestCodeGenerator:
+class test_code_generator:
 
     def test_validate_setup_single_selection(self, mock_view):
         """Test validate_setup allows single non-empty selection"""
@@ -180,7 +180,7 @@ class TestCodeGenerator:
             "Something is wrong, did not receive response - aborting")
 
 
-class TestBaseCodeGenerator:
+class test_base_code_generator:
     
     def test_base_execute_calls_validate_setup(self, mock_view):
         """Test base_execute calls validate_setup"""
@@ -256,7 +256,7 @@ class TestBaseCodeGenerator:
             assert result is not None
 
 
-class TestConcreteCodeGenerators:
+class test_concrete_code_generators:
     
     def test_generate_code_generator(self, mock_view):
         """Test generate_code_generator settings"""
@@ -292,7 +292,7 @@ class TestConcreteCodeGenerators:
         assert cmd.additional_instruction() == "Instruction: translate to python"
 
 
-class TestInstructionInputHandler:
+class test_instruction_input_handler:
     
     def test_instruction_input_handler_methods(self):
         """Test instruction_input_handler methods"""
