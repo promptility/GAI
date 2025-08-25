@@ -5,28 +5,31 @@ sublime_plugin = importlib.import_module('sublime_plugin')
 
 from ._base import _base_text_command
 from .config import gai_config
-from .async async_code_generator, logger
+# The async worker module provides the thread class and logger.
+from .async_worker import async_code_generator, logger
 import json
+
 
 class gai_replace_text_command(_base_text_command()):
     """
     Simple command that replaces the text in the given region.
     In the real Sublime environment the command is instantiated by the
-    editor and receives the view automatically.  The unit‑tests instantiate
+    editor and receives the view automatically. The unit‑tests instantiate
     the command manually, so we need an ``__init__`` that
     accepts the view and stores it on the instance.
     """
     def __init__(self, view):
         # ``_base_text_command`` may be ``object`` in the test harness,
         # therefore we cannot rely on ``super()`` calling a real base
-        # ``__init__``.  Simply store the view for later use.
+        # ``__init__``. Simply store the view for later use.
         self.view = view
 
     def run(self, edit, region, text):
-        # ``region`` is supplied as a tuple, end).  The real
-        # Sublime API expects a ``sublime.Region`` instance, which is
-        # mocked in the test suite.  Expanding the tuple creates the
-        # mock Region object.
+        """
+        ``region`` is supplied as a tuple (begin, end). The real Sublime API
+        expects a ``sublime.Region`` instance, which is mocked in the test
+        suite. Expanding the tuple creates the mock Region object.
+        """
         region = sublime.Region(*region)
         self.view.replace(edit, region, text)
 
@@ -40,7 +43,7 @@ class gai_generate_text_command(_base_text_command()):
         try:
             super().__init__(view)
         except TypeError:
-            # In test environment, just store the view
+            # In environment, just store the view
             pass
         self.view = view
 
@@ -144,11 +147,11 @@ class gai_generate_text_command(_base_text_command()):
         return await_result
 
 
-class gai_edit_plugin_settings_command(
-        sublime_plugin.ApplicationCommand
-        if isinstance(sublime_plugin.ApplicationCommand, type)
-           def run(self):
-        """Open GAI settings in a new window with split layout."""
+class gai_edit_plugin_settings_command(sublime_plugin.ApplicationCommand):
+    """
+    Open GAI settings in a new window with split layout.
+    """
+    def run(self):
         sublime.run_command('new_window')
         new_window = sublime.active_window()
         new_window.run_command('set_layout', {
@@ -161,4 +164,4 @@ class gai_edit_plugin_settings_command(
             'open_file', {'file': '${packages}/GAI/gai.sublime-settings'})
         new_window.focus_group(1)
         new_window.run_command(
-            'open_file', {'file':}/User/gai.sublime-settings'})
+            'open_file', {'file': '${packages}/User/gai.sublime-settings'})
