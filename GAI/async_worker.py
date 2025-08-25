@@ -69,17 +69,17 @@ class async_code_generator(threading.Thread):
     def get_code_generator_response(self):
 
         self.endpoint = self.config_handle.get("open_ai_endpoint")
-        self.apibase = self.config_handle.get("open_ai_base")
-        self.apikey = self.config_handle.get("open_ai_key")
+        self.api_base = self.config_handle.get("open_ai_base")
+        self.api_key = self.config_handle.get("open_ai_key")
         self.data = self.data_handle("data")
         self.text_replace = self.data_handle("text")
 
         connection = http.client.HTTPSConnection(
-            self.apibase)
+            self.api_base)
 
         headers = {
-            'api-key': self.apikey,
-            'Authorization': 'Bearer {}'.format(self.apikey),
+            'api-key': self.api_key,
+            'Authorization': 'Bearer {}'.format(self.api_key),
             'Content-Type': 'application/json'
         }
         data = json.dumps(self.data)

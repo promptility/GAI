@@ -130,10 +130,10 @@ class base_code_generator(code_generator):
 
         data_handle = self.create_data(config_handle, code_region)
 
-        codex_thread = async_code_generator(selected_region, config_handle,
-                                            data_handle)
-        codex_thread.start()
-        self.manage_thread(codex_thread, config_handle.__running_config__.get(
+        ai_thread = async_code_generator(selected_region, config_handle,
+                                         data_handle)
+        ai_thread.start()
+        self.manage_thread(ai_thread, config_handle.__running_config__.get(
                            "max_seconds", 60))
 
     def create_data(self, config_handle, code_region):
@@ -171,11 +171,11 @@ class base_code_generator(code_generator):
             if log_level in ["requests", "all"]:
                 logger.info("Request Data: %s", json.dumps(data, indent=4))
 
-        prepthread = threading.Thread(target=async_prepare)
-        prepthread.start()
+        prep_thread = threading.Thread(target=async_prepare)
+        prep_thread.start()
 
         def await_result(field):
-            prepthread.join()
+            prep_thread.join()
             return data_container.get(field)
 
         return await_result

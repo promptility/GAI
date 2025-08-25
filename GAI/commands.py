@@ -67,11 +67,52 @@ class GaiGenerateTextCommand(_base_text_command()):
         code_region = self.view.substr(selected_region)
 
         data_handle = self.create_data(config_handle, code_region)
-        codex_thread = async_code_generator(selected_region, config_handle,
-                                            data_handle)
-        codex_thread.start()
-        self.manage_thread(codex_thread,
+        ai_thread = async_code_generator(selected_region, config_handle,
+                                         data_handle)
+        ai_thread.start()
+        self.manage_thread(ai_thread,
                            config_handle.__running_config__.get("max_seconds", 60))
+
+    def manage_thread(self, thread, max_time, seconds=0):
+        """
+        Manages the running thread and checks it's still running or if it
+        has a result.
+        """
+        window = self.view.window()
+
+        if seconds >= max_time:
+            message = "Ran out of time! {}s".format(max_time)
+            if window:
+                window.status_message(message)
+            else:
+                sublime.status_message(message)
+            return
+
+        if thread.running:
+            message = "Thinking, one moment... ({}/{}s)".format(
+                seconds, max_time)
+            if window:
+                window.status_message(message)
+            else:
+                sublime.status_message(message)
+            sublime.set_timeout(lambda:
+                                self.manage_thread(thread,
+                                                   max_time,
+                                                   seconds + 1), 1000)
+            return
+
+        if not thread.result:
+            message = "Something is wrong, did not receive response - aborting"
+            if window:
+                window.status_message(message)
+            else:
+                sublime.status_message(message)
+            return
+
+        self.view.run_command('replace_text', {
+            "region": [thread.region.begin(), thread.region.end()],
+            "text": thread.text_replace + thread.result
+        })
 
     def create_data(self, config_handle, code_region):
         """Build prompt payload."""
