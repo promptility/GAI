@@ -42,7 +42,7 @@ from .core import (
 from .config import gai_config
 
 # Commands that are invoked directly by Sublime
-from .commands import replace_text_command, edit_gai_plugin_settings_command
+from .commands import replace_text_command, edit_gai_plugin_settings_command, generate_text_command
 
 # Small helper used by the edit command
 from .instruction import instruction_input_handler
@@ -62,6 +62,7 @@ __all__ = [
     "gai_config",
     "replace_text_command",
     "edit_gai_plugin_settings_command",
+    "generate_text_command",
     "instruction_input_handler",
     "async_code_generator",
 ]
