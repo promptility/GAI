@@ -39,7 +39,7 @@ from .core import (
 )
 
 # Config handling
-from .config import gai_config
+from GAI.config import gai_config
 
 # Commands that are invoked directly by Sublime
 from .commands import replace_text_command, edit_gai_plugin_settings_command, generate_text_command
