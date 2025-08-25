@@ -43,7 +43,7 @@ class Test_async_code_generator:
     def test_async_code_generator_init(self, mock_region, mock_config_handle, mock_data_handle):
         """Test async_code_generator initialization"""
         thread = async_code_generator(mock_region, mock_config_handle, mock_data_handle)
-        
+
         assert thread.region == mock_region
         assert thread.config_handle == mock_config_handle
         assert thread.data_handle == mock_data_handle
@@ -53,10 +53,10 @@ class Test_async_code_generator:
     def test_async_code_generator_run_cancelled(self, mock_region, mock_config_handle, mock_data_handle):
         """Test async_code_generator run when cancelled"""
         mock_config_handle.is_cancelled.return_value = True
-        
+
         thread = async_code_generator(mock_region, mock_config_handle, mock_data_handle)
         thread.run()
-        
+
         assert thread.running == False
         assert thread.result == []
 
@@ -67,16 +67,35 @@ class Test_async_code_generator:
             # Create actual mock StreamHandler instance
             mock_stream_handler = MagicMock()
             mock_stream_handler_class.return_value = mock_stream_handler
-            
+
             mock_config = Mock()
-            mock_config.get.side_effect = lambda key, default=None: "debug" if key == "log_level" 
-            # No file_log_io
+            mock_config.get.side_effect = lambda key, default=None: "debug" if key == "log_level" else None
+
             thread = async_code_generator(Mock(), mock_config, Mock())
             thread.setup_logs()
-            
+
             # Verify stream handler was added
             mock_stream_handler_class.assert_called()
 
-    def test_setup_logs_adds_file_handler:
-        """
+    def test_setup_logs_adds_file_handler(self):
+        """Test setup_logs adds file handler when a log file is configured"""
+        # Mock the logging.FileHandler class
+        with patch('logging.FileHandler') as mock_file_handler_class:
+            mock_file_handler = MagicMock()
+            mock_file_handler_class.return_value = mock_file_handler
 
+            mock_config = Mock()
+            # Return a dummy log level and a log file path
+            def config_get(key, default=None):
+                if key == "log_level":
+                    return "debug"
+                if key == "log_file":
+                    return "/tmp/gai_test.log"
+                return default
+            mock_config.get.side_effect = config_get
+
+            thread = async_code_generator(Mock(), mock_config, Mock())
+            thread.setup_logs()
+
+            # Verify that FileHandler was instantiated with the provided path
+            mock_file_handler_class.assert_called_with("/tmp/gai_test.log")
